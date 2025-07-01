@@ -85,6 +85,9 @@ build/
 android/build/
 example/build/
 example/.dart_tool/
+example/.vscode/
+example/pubspec.lock
+
 
 # Android
 android/.gradle/
