@@ -32,6 +32,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+pubspec.lock
 
 # Symbolication related
 app.*.symbols
@@ -45,6 +46,7 @@ app.*.map.json
 **/android/captures/
 **/android/gradlew
 **/android/gradlew.bat
+example/android/build/
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 
@@ -77,3 +79,38 @@ app.*.map.json
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
+
+# Build outputs
+build/
+android/build/
+example/build/
+example/.dart_tool/
+
+# Android
+android/.gradle/
+android/.idea/
+android/.settings/
+android/local.properties
+android/captures/
+android/gradle/wrapper/gradle-wrapper.jar
+android/build/reports/
+
+# Example Android
+example/android/.gradle/
+example/android/.idea/
+example/android/local.properties
+
+# Coverage & test output
+coverage/
+test_output/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# System
+*.log
+*.tmp
+*.swp
+*.DS_Store

@@ -1,0 +1,43 @@
+# IDE
+.idea/
+.vscode/
+
+# Build output
+build/
+android/.gradle/
+android/.idea/
+android/local.properties
+android/.settings/
+android/build/
+android/captures/
+android/.externalNativeBuild/
+
+# Example build output
+example/build/
+example/android/.gradle/
+example/android/build/
+example/android/.idea/
+example/.dart_tool/
+
+# Intermediate files
+.dart_tool/
+.packages
+pubspec.lock
+
+# Tests output
+coverage/
+test_output/
+
+# Reports
+android/build/reports/
+
+# Gradle wrapper cache
+android/gradle/wrapper/gradle-wrapper.jar
+
+# Misc
+*.iml
+*.DS_Store
+*.lock
+*.log
+*.tmp
+*.swp
