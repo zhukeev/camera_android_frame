@@ -1,0 +1,1 @@
+/Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/app/intermediates/cxx/Debug/2k3a4b6h/obj/arm64-v8a

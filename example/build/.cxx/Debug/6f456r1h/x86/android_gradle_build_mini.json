@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/argenzhukeev/Downloads/flutter/packages/flutter_tools/gradle/src/main/scripts/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/argenzhukeev/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/.cxx/Debug/6f456r1h/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/argenzhukeev/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/.cxx/Debug/6f456r1h/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

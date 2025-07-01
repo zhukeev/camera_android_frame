@@ -1,0 +1,344 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:1:1-29:12
+INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:1:1-29:12
+INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:1:1-29:12
+INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:1:1-29:12
+MERGED from [:camera_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/camera_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-10:12
+MERGED from [:flutter_plugin_android_lifecycle] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/flutter_plugin_android_lifecycle/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-7:12
+MERGED from [:integration_test] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/integration_test/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:1-12:12
+MERGED from [:path_provider_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/path_provider_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-7:12
+MERGED from [:video_player_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/video_player_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.fragment:fragment:1.7.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/14916ef4c4f37174fe143e45cc8e78d6/transformed/fragment-1.7.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.media3:media3-extractor:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/85dd8a54e9291205ef146b555b51ea62/transformed/media3-extractor-1.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-container:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/056c29332e6ec25bd1e164049d88eceb/transformed/media3-container-1.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-datasource:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/bf863ac252e0c91081bb273e076ed531/transformed/media3-datasource-1.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-decoder:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/f49306f3c891361540b82d3964e73e75/transformed/media3-decoder-1.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-database:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/8cecc46ed29eb983cd1eda08651ef48e/transformed/media3-database-1.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-common:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a93c9d6ee836be2cdb5b7cf9ac8537cb/transformed/media3-common-1.4.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.media3:media3-exoplayer-hls:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/1a9ceb81d26cbf9eb459bec274379473/transformed/media3-exoplayer-hls-1.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-exoplayer-dash:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/9b80d231d55d3fdc3edd482f59151a6d/transformed/media3-exoplayer-dash-1.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-exoplayer-rtsp:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/079b57500560c277a6cce7c46f517a0f/transformed/media3-exoplayer-rtsp-1.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-exoplayer-smoothstreaming:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/ec89cfec54ccc88dff87ea2f4d4fe297/transformed/media3-exoplayer-smoothstreaming-1.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-exoplayer:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/b87bea114c1cc45b6ac0b470f0f6fccd/transformed/media3-exoplayer-1.4.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.window:window:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/faea7a5cc09159126e4c2ed95772e482/transformed/window-1.2.0/AndroidManifest.xml:17:1-31:12
+MERGED from [androidx.window:window-java:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a957e67a8f541532944f06ef2657222b/transformed/window-java-1.2.0/AndroidManifest.xml:17:1-21:12
+MERGED from [androidx.activity:activity:1.8.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/043873b882908199cfaec49641f9705e/transformed/activity-1.8.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a584e0d89431c677ca46e4d69cff9148/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/b00214971be11b8d8be835bd3b668edd/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/606a9e5277c4b737f29c8e6578b7fabe/transformed/lifecycle-livedata-core-ktx-2.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/f7f2c4954cd3ce5f544bb67cd7467056/transformed/lifecycle-livedata-2.7.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/382b483914789c12753ac1379fd750e2/transformed/lifecycle-viewmodel-2.7.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/116b513b511babd316f467b6c6208d3a/transformed/lifecycle-livedata-core-2.7.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a1a29ab04e5df64825ef54c6f193673d/transformed/lifecycle-viewmodel-savedstate-2.7.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core-ktx:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/f202b05107bc78c7305e5ade2eb772c2/transformed/core-ktx-1.13.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.customview:customview:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/01586d731830a41ac49fa5ccc026a001/transformed/customview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/bca059f48d3e07009302b61bd237f6ef/transformed/lifecycle-runtime-2.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.savedstate:savedstate:1.2.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/216bdf6275b8443d4d40ff7db2e27648/transformed/savedstate-1.2.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.test:rules:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/97a193cb8500d5f7363907f0d1fb473d/transformed/rules-1.2.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.test.espresso:espresso-core:3.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/2ceae5aece062a372e868ffcd303113b/transformed/espresso-core-3.2.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.test:runner:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/9def662e659fc59ce9f4ee2e39865318/transformed/runner-1.2.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/0e162c558682b87a53c5f74ccc1727cd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/969cb187863f73ad293569a7fa9f3124/transformed/tracing-1.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.test:monitor:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/d0021dd183e30eb465efe8f66a1b5deb/transformed/monitor-1.2.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/970d5fe70787b21a564ac6fb42b8779c/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.exifinterface:exifinterface:1.3.6] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/ad6292569af92da584d27f8780ac1905/transformed/exifinterface-1.3.6/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/4c7ebdcaf1c6a0ebb18167f6544cb325/transformed/core-runtime-2.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/02db4294fac3a30a67a52baebd186559/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.window.extensions.core:core:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/d7115f79a7bf587f38934a8fa4fbf640/transformed/core-1.0.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/d51e6c365e8b79653d1a65074aca75bc/transformed/annotation-experimental-1.4.0/AndroidManifest.xml:2:1-7:12
+MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/9078a1ff199770c6462c2652ce65f5d7/transformed/relinker-1.4.5/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.test.espresso:espresso-idling-resource:3.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/748d8cf7fdac02b824691fa3fe5bee8a/transformed/espresso-idling-resource-3.2.0/AndroidManifest.xml:17:1-24:12
+	package
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:2:3-45
+		INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:1:11-69
+application
+ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:4:3-21:17
+INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:4:3-21:17
+MERGED from [androidx.window:window:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/faea7a5cc09159126e4c2ed95772e482/transformed/window-1.2.0/AndroidManifest.xml:22:5-29:19
+MERGED from [androidx.window:window:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/faea7a5cc09159126e4c2ed95772e482/transformed/window-1.2.0/AndroidManifest.xml:22:5-29:19
+MERGED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:28:5-89
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/0e162c558682b87a53c5f74ccc1727cd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/0e162c558682b87a53c5f74ccc1727cd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/970d5fe70787b21a564ac6fb42b8779c/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/970d5fe70787b21a564ac6fb42b8779c/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+	android:extractNativeLibs
+		INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
+	android:label
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:6:5-35
+	android:icon
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:5:5-39
+activity#io.flutter.embedding.android.FlutterActivity
+ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:7:5-19:16
+	android:launchMode
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:11:7-37
+	android:hardwareAccelerated
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:9:7-41
+	android:windowSoftInputMode
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:14:7-49
+	android:exported
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:10:7-30
+	android:configChanges
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:8:7-100
+	android:theme
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:13:7-41
+	android:name
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:12:7-66
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:15:7-18:23
+action#android.intent.action.MAIN
+ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:16:9-60
+	android:name
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:16:17-58
+category#android.intent.category.LAUNCHER
+ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:17:9-68
+	android:name
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:17:19-66
+meta-data#flutterEmbedding
+ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:20:5-67
+	android:value
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:20:48-65
+	android:name
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:20:16-47
+uses-feature#android.hardware.camera
+ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:23:3-25:30
+	android:required
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:25:5-28
+	android:name
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:24:5-43
+uses-permission#android.permission.INTERNET
+ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:27:3-64
+	android:name
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:27:20-62
+uses-permission#android.permission.FLASHLIGHT
+ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:28:3-66
+	android:name
+		ADDED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml:28:20-64
+uses-sdk
+INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml
+INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml
+MERGED from [:camera_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/camera_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:camera_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/camera_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:flutter_plugin_android_lifecycle] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/flutter_plugin_android_lifecycle/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:flutter_plugin_android_lifecycle] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/flutter_plugin_android_lifecycle/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:integration_test] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/integration_test/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:10:5-44
+MERGED from [:integration_test] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/integration_test/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:10:5-44
+MERGED from [:path_provider_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/path_provider_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:path_provider_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/path_provider_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:video_player_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/video_player_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [:video_player_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/video_player_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:5:5-44
+MERGED from [androidx.fragment:fragment:1.7.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/14916ef4c4f37174fe143e45cc8e78d6/transformed/fragment-1.7.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.fragment:fragment:1.7.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/14916ef4c4f37174fe143e45cc8e78d6/transformed/fragment-1.7.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.media3:media3-extractor:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/85dd8a54e9291205ef146b555b51ea62/transformed/media3-extractor-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-extractor:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/85dd8a54e9291205ef146b555b51ea62/transformed/media3-extractor-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-container:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/056c29332e6ec25bd1e164049d88eceb/transformed/media3-container-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-container:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/056c29332e6ec25bd1e164049d88eceb/transformed/media3-container-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-datasource:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/bf863ac252e0c91081bb273e076ed531/transformed/media3-datasource-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-datasource:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/bf863ac252e0c91081bb273e076ed531/transformed/media3-datasource-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-decoder:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/f49306f3c891361540b82d3964e73e75/transformed/media3-decoder-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-decoder:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/f49306f3c891361540b82d3964e73e75/transformed/media3-decoder-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-database:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/8cecc46ed29eb983cd1eda08651ef48e/transformed/media3-database-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-database:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/8cecc46ed29eb983cd1eda08651ef48e/transformed/media3-database-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-common:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a93c9d6ee836be2cdb5b7cf9ac8537cb/transformed/media3-common-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-common:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a93c9d6ee836be2cdb5b7cf9ac8537cb/transformed/media3-common-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-hls:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/1a9ceb81d26cbf9eb459bec274379473/transformed/media3-exoplayer-hls-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-hls:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/1a9ceb81d26cbf9eb459bec274379473/transformed/media3-exoplayer-hls-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-dash:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/9b80d231d55d3fdc3edd482f59151a6d/transformed/media3-exoplayer-dash-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-dash:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/9b80d231d55d3fdc3edd482f59151a6d/transformed/media3-exoplayer-dash-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-rtsp:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/079b57500560c277a6cce7c46f517a0f/transformed/media3-exoplayer-rtsp-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-rtsp:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/079b57500560c277a6cce7c46f517a0f/transformed/media3-exoplayer-rtsp-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-smoothstreaming:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/ec89cfec54ccc88dff87ea2f4d4fe297/transformed/media3-exoplayer-smoothstreaming-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-smoothstreaming:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/ec89cfec54ccc88dff87ea2f4d4fe297/transformed/media3-exoplayer-smoothstreaming-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/b87bea114c1cc45b6ac0b470f0f6fccd/transformed/media3-exoplayer-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/b87bea114c1cc45b6ac0b470f0f6fccd/transformed/media3-exoplayer-1.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.window:window:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/faea7a5cc09159126e4c2ed95772e482/transformed/window-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.window:window:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/faea7a5cc09159126e4c2ed95772e482/transformed/window-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.window:window-java:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a957e67a8f541532944f06ef2657222b/transformed/window-java-1.2.0/AndroidManifest.xml:19:5-44
+MERGED from [androidx.window:window-java:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a957e67a8f541532944f06ef2657222b/transformed/window-java-1.2.0/AndroidManifest.xml:19:5-44
+MERGED from [androidx.activity:activity:1.8.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/043873b882908199cfaec49641f9705e/transformed/activity-1.8.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.8.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/043873b882908199cfaec49641f9705e/transformed/activity-1.8.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a584e0d89431c677ca46e4d69cff9148/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a584e0d89431c677ca46e4d69cff9148/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/b00214971be11b8d8be835bd3b668edd/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/b00214971be11b8d8be835bd3b668edd/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/606a9e5277c4b737f29c8e6578b7fabe/transformed/lifecycle-livedata-core-ktx-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/606a9e5277c4b737f29c8e6578b7fabe/transformed/lifecycle-livedata-core-ktx-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/f7f2c4954cd3ce5f544bb67cd7467056/transformed/lifecycle-livedata-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/f7f2c4954cd3ce5f544bb67cd7467056/transformed/lifecycle-livedata-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/382b483914789c12753ac1379fd750e2/transformed/lifecycle-viewmodel-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/382b483914789c12753ac1379fd750e2/transformed/lifecycle-viewmodel-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/116b513b511babd316f467b6c6208d3a/transformed/lifecycle-livedata-core-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/116b513b511babd316f467b6c6208d3a/transformed/lifecycle-livedata-core-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a1a29ab04e5df64825ef54c6f193673d/transformed/lifecycle-viewmodel-savedstate-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a1a29ab04e5df64825ef54c6f193673d/transformed/lifecycle-viewmodel-savedstate-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-ktx:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/f202b05107bc78c7305e5ade2eb772c2/transformed/core-ktx-1.13.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/f202b05107bc78c7305e5ade2eb772c2/transformed/core-ktx-1.13.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.customview:customview:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/01586d731830a41ac49fa5ccc026a001/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/01586d731830a41ac49fa5ccc026a001/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/bca059f48d3e07009302b61bd237f6ef/transformed/lifecycle-runtime-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/bca059f48d3e07009302b61bd237f6ef/transformed/lifecycle-runtime-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/216bdf6275b8443d4d40ff7db2e27648/transformed/savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/216bdf6275b8443d4d40ff7db2e27648/transformed/savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.test:rules:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/97a193cb8500d5f7363907f0d1fb473d/transformed/rules-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.test:rules:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/97a193cb8500d5f7363907f0d1fb473d/transformed/rules-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.test.espresso:espresso-core:3.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/2ceae5aece062a372e868ffcd303113b/transformed/espresso-core-3.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.test.espresso:espresso-core:3.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/2ceae5aece062a372e868ffcd303113b/transformed/espresso-core-3.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.test:runner:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/9def662e659fc59ce9f4ee2e39865318/transformed/runner-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.test:runner:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/9def662e659fc59ce9f4ee2e39865318/transformed/runner-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/0e162c558682b87a53c5f74ccc1727cd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/0e162c558682b87a53c5f74ccc1727cd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/969cb187863f73ad293569a7fa9f3124/transformed/tracing-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/969cb187863f73ad293569a7fa9f3124/transformed/tracing-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.test:monitor:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/d0021dd183e30eb465efe8f66a1b5deb/transformed/monitor-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.test:monitor:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/d0021dd183e30eb465efe8f66a1b5deb/transformed/monitor-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/970d5fe70787b21a564ac6fb42b8779c/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/970d5fe70787b21a564ac6fb42b8779c/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.exifinterface:exifinterface:1.3.6] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/ad6292569af92da584d27f8780ac1905/transformed/exifinterface-1.3.6/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.exifinterface:exifinterface:1.3.6] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/ad6292569af92da584d27f8780ac1905/transformed/exifinterface-1.3.6/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/4c7ebdcaf1c6a0ebb18167f6544cb325/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/4c7ebdcaf1c6a0ebb18167f6544cb325/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/02db4294fac3a30a67a52baebd186559/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/02db4294fac3a30a67a52baebd186559/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.window.extensions.core:core:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/d7115f79a7bf587f38934a8fa4fbf640/transformed/core-1.0.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.window.extensions.core:core:1.0.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/d7115f79a7bf587f38934a8fa4fbf640/transformed/core-1.0.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/d51e6c365e8b79653d1a65074aca75bc/transformed/annotation-experimental-1.4.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/d51e6c365e8b79653d1a65074aca75bc/transformed/annotation-experimental-1.4.0/AndroidManifest.xml:5:5-44
+MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/9078a1ff199770c6462c2652ce65f5d7/transformed/relinker-1.4.5/AndroidManifest.xml:5:5-43
+MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/9078a1ff199770c6462c2652ce65f5d7/transformed/relinker-1.4.5/AndroidManifest.xml:5:5-43
+MERGED from [androidx.test.espresso:espresso-idling-resource:3.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/748d8cf7fdac02b824691fa3fe5bee8a/transformed/espresso-idling-resource-3.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.test.espresso:espresso-idling-resource:3.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/748d8cf7fdac02b824691fa3fe5bee8a/transformed/espresso-idling-resource-3.2.0/AndroidManifest.xml:20:5-22:41
+	android:targetSdkVersion
+		INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/android/app/src/main/AndroidManifest.xml
+uses-permission#android.permission.CAMERA
+ADDED from [:camera_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/camera_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:5-65
+	android:name
+		ADDED from [:camera_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/camera_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:7:22-62
+uses-permission#android.permission.RECORD_AUDIO
+ADDED from [:camera_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/camera_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:8:5-71
+	android:name
+		ADDED from [:camera_android] /Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/camera_android/intermediates/merged_manifest/debug/processDebugManifest/AndroidManifest.xml:8:22-68
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from [androidx.media3:media3-common:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a93c9d6ee836be2cdb5b7cf9ac8537cb/transformed/media3-common-1.4.0/AndroidManifest.xml:22:5-79
+MERGED from [androidx.media3:media3-exoplayer:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/b87bea114c1cc45b6ac0b470f0f6fccd/transformed/media3-exoplayer-1.4.0/AndroidManifest.xml:22:5-79
+MERGED from [androidx.media3:media3-exoplayer:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/b87bea114c1cc45b6ac0b470f0f6fccd/transformed/media3-exoplayer-1.4.0/AndroidManifest.xml:22:5-79
+	android:name
+		ADDED from [androidx.media3:media3-common:1.4.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/a93c9d6ee836be2cdb5b7cf9ac8537cb/transformed/media3-common-1.4.0/AndroidManifest.xml:22:22-76
+uses-library#androidx.window.extensions
+ADDED from [androidx.window:window:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/faea7a5cc09159126e4c2ed95772e482/transformed/window-1.2.0/AndroidManifest.xml:23:9-25:40
+	android:required
+		ADDED from [androidx.window:window:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/faea7a5cc09159126e4c2ed95772e482/transformed/window-1.2.0/AndroidManifest.xml:25:13-37
+	android:name
+		ADDED from [androidx.window:window:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/faea7a5cc09159126e4c2ed95772e482/transformed/window-1.2.0/AndroidManifest.xml:24:13-54
+uses-library#androidx.window.sidecar
+ADDED from [androidx.window:window:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/faea7a5cc09159126e4c2ed95772e482/transformed/window-1.2.0/AndroidManifest.xml:26:9-28:40
+	android:required
+		ADDED from [androidx.window:window:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/faea7a5cc09159126e4c2ed95772e482/transformed/window-1.2.0/AndroidManifest.xml:28:13-37
+	android:name
+		ADDED from [androidx.window:window:1.2.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/faea7a5cc09159126e4c2ed95772e482/transformed/window-1.2.0/AndroidManifest.xml:27:13-51
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
+permission#io.flutter.plugins.cameraexample.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
+uses-permission#io.flutter.plugins.cameraexample.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.13.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/cf0497c32291722cbedbc0978bfb55a3/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/0e162c558682b87a53c5f74ccc1727cd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/0e162c558682b87a53c5f74ccc1727cd/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:25:13-67
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/c4f01148c72a3041a77a03328cbcde77/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:30:17-78
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] /Users/argenzhukeev/.gradle/caches/8.11.1/transforms/673dfe1c369f7074de17f12df47ff40c/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92

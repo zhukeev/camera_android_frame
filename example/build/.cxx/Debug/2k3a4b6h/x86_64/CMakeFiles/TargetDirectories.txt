@@ -1,0 +1,2 @@
+/Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/.cxx/Debug/2k3a4b6h/x86_64/CMakeFiles/edit_cache.dir
+/Users/argenzhukeev/projects/packages/packages/camera/camera_android/example/build/.cxx/Debug/2k3a4b6h/x86_64/CMakeFiles/rebuild_cache.dir
