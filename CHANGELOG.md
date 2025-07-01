@@ -1,3 +1,13 @@
+## 0.10.10+4
+
+* ✨ Added support for `capturePreviewFrame()` to get a single JPEG-encoded frame from the camera preview.
+  * Uses YUV image format and fast conversion.
+  * Useful for lightweight snapshot functionality or preview-based analysis.
+
+* 🧼 Refactored internal camera session setup to allow conditional use of frame stream readers.
+
+* ✅ Compatible with existing preview and image capture functionality.
+
 ## 0.10.10+3
 
 * Waits for the creation of the capture session when initializing the camera to avoid thread race conditions.
