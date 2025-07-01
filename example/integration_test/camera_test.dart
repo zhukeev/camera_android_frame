@@ -4,7 +4,7 @@
 
 import 'dart:io';
 
-import 'package:camera_android/camera_android.dart';
+import 'package:camera_android_frame/camera_android_frame.dart';
 import 'package:camera_example/camera_controller.dart';
 import 'package:camera_platform_interface_frame/camera_platform_interface_frame.dart';
 import 'package:flutter/services.dart';

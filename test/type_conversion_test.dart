@@ -4,7 +4,7 @@
 
 import 'dart:typed_data';
 
-import 'package:camera_android/src/type_conversion.dart';
+import 'package:camera_android_frame/src/type_conversion.dart';
 import 'package:camera_platform_interface_frame/camera_platform_interface_frame.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:camera_android/src/messages.g.dart';
-import 'package:camera_android/src/utils.dart';
+import 'package:camera_android_frame/src/messages.g.dart';
+import 'package:camera_android_frame/src/utils.dart';
 import 'package:camera_platform_interface_frame/camera_platform_interface_frame.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
