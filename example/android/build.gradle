@@ -28,7 +28,7 @@ tasks.register("clean", Delete) {
 // warnings (e.g., deprecation warnings from a newer SDK than this project
 // builds with).
 gradle.projectsEvaluated {
-    project(":camera_android") {
+    project(":camera_android_frame") {
         tasks.withType(JavaCompile) {
             // Ignore classfile due to https://issuetracker.google.com/issues/342067844
             options.compilerArgs << "-Xlint:all" << "-Werror" << "-Xlint:-classfile"
