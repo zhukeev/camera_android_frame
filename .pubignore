@@ -69,3 +69,12 @@ example/.vscode/
 *.cer
 *.crt
 *.p12
+
+.flutter-plugins
+.flutter-plugins-dependencies
+.vscode/
+example/.flutter-plugins
+example/.flutter-plugins-dependencies
+example/.vscode/
+example/android/local.properties
+pubspec.lock
