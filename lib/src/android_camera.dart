@@ -56,6 +56,12 @@ class AndroidCamera extends CameraPlatform {
   // The stream for vending frames to platform interface clients.
   StreamController<CameraImageData>? _frameStreamController;
 
+  // The stream to receive frames from the native code.
+  StreamSubscription<dynamic>? _platformFramesStreamSubscription;
+
+  // The stream for vending frames to platform interface clients.
+  StreamController<Uint8List>? _framesStreamController;
+
   Stream<CameraEvent> _cameraEvents(int cameraId) =>
       cameraEventStreamController.stream.where((CameraEvent event) => event.cameraId == cameraId);
 
@@ -183,6 +189,18 @@ class AndroidCamera extends CameraPlatform {
     return _hostApi.capturePreviewFrame();
   }
 
+  @override
+  Future<void> startListenFrames(void Function(Uint8List image)? frameCallback) async {
+    await _hostApi.startListenFrames();
+    _startFramesStreamListener();
+    _installFramesStreamController().stream.listen(frameCallback);
+  }
+
+  @override
+  Future<void> stopListenFrames() {
+    return _hostApi.stopListenFrames();
+  }
+
   // This optimization is unnecessary on Android.
   @override
   Future<void> prepareForVideoRecording() async {}
@@ -234,6 +252,16 @@ class AndroidCamera extends CameraPlatform {
     return _frameStreamController!;
   }
 
+  StreamController<Uint8List> _installFramesStreamController({void Function()? onListen}) {
+    _framesStreamController = StreamController<Uint8List>(
+      onListen: onListen ?? () {},
+      onPause: _onFramesStreamPauseResume,
+      onResume: _onFramesStreamPauseResume,
+      onCancel: _onFramesStreamCancel,
+    );
+    return _framesStreamController!;
+  }
+
   void _onFrameStreamListen() {
     _startPlatformStream();
   }
@@ -250,6 +278,13 @@ class AndroidCamera extends CameraPlatform {
     });
   }
 
+  void _startFramesStreamListener() {
+    const EventChannel framesEventChannel = EventChannel('plugins.flutter.io/camera_android/framesStream');
+    _platformImageStreamSubscription = framesEventChannel.receiveBroadcastStream().listen((dynamic frame) {
+      _framesStreamController!.add(frame as Uint8List);
+    });
+  }
+
   FutureOr<void> _onFrameStreamCancel() async {
     await _hostApi.stopImageStream();
     await _platformImageStreamSubscription?.cancel();
@@ -257,7 +292,18 @@ class AndroidCamera extends CameraPlatform {
     _frameStreamController = null;
   }
 
+  FutureOr<void> _onFramesStreamCancel() async {
+    await _hostApi.stopListenFrames();
+    await _platformFramesStreamSubscription?.cancel();
+    _platformFramesStreamSubscription = null;
+    _framesStreamController = null;
+  }
+
   void _onFrameStreamPauseResume() {
+    throw CameraException('InvalidCall', 'Pause and resume are not supported for onStreamedFrameAvailable');
+  }
+
+  void _onFramesStreamPauseResume() {
     throw CameraException('InvalidCall', 'Pause and resume are not supported for onStreamedFrameAvailable');
   }
 

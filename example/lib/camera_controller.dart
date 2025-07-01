@@ -285,6 +285,14 @@ class CameraController extends ValueNotifier<CameraValue> {
     return CameraPlatform.instance.capturePreviewFrame();
   }
 
+  Future<void> startFrameStream(void Function(Uint8List image) onAvailable) {
+    return CameraPlatform.instance.startListenFrames(onAvailable);
+  }
+
+  Future<void> stopFrameStream() {
+    return CameraPlatform.instance.stopListenFrames();
+  }
+
   /// Start streaming images from platform camera.
   Future<void> startImageStream(void Function(CameraImageData image) onAvailable) async {
     _imageStreamSubscription =

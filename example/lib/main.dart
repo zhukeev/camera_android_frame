@@ -961,8 +961,23 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
 
     try {
       final XFile file = await cameraController.takePicture();
-      final bytes = await cameraController.capturePreviewFrame();
-      print(bytes);
+      final sw = Stopwatch()..start();
+       await cameraController.capturePreviewFrame();
+      print('frame took ${sw.elapsedMilliseconds} ms');
+
+      DateTime lastTime = DateTime.now();
+
+      Future.delayed(Duration(seconds: 5), () {
+        cameraController.stopFrameStream();
+        print('stopped frame stream');
+      });
+
+      await cameraController.startFrameStream((frame) {
+        print('frame took ${DateTime.now().difference(lastTime).inMilliseconds} ms ${frame.length} bytes');
+        lastTime = DateTime.now();
+      });
+      print('frame took ${sw.elapsedMilliseconds} ms');
+      // print(bytes);
       return file;
     } on CameraException catch (e) {
       _showCameraException(e);

@@ -126,11 +126,11 @@ class Camera
   @VisibleForTesting ImageReader pictureImageReader;
   ImageStreamReader imageStreamReader;
   ImageReader frameStreamReader;
-  // Флаг, нужно ли сейчас отдавать кадр
-  private volatile boolean frameRequested = false;
+  private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-  // Переменная для хранения результата колбэка
-  private Messages.Result<byte[]> pendingResult = null;
+  private EventChannel.EventSink frameStreamSink = null;
+  private volatile FrameCaptureMode frameMode = FrameCaptureMode.NONE;
+  private Messages.Result<byte[]> pendingFrameResult = null;
 
   private byte[] lastFrameJpeg;
   private final Object frameLock = new Object();
@@ -384,52 +384,49 @@ class Camera
             ImageFormat.YUV_420_888,
             2);
 
-frameStreamReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
-    @Override
-    public void onImageAvailable(ImageReader reader) {
-        if (!frameRequested) {
-            // Кадр не запрашивали — просто закрываем и пропускаем
-            Image image = null;
-            try {
-                image = reader.acquireLatestImage();
-            } finally {
-                if (image != null) image.close();
-            }
-            return;
-        }
+frameStreamReader.setOnImageAvailableListener(reader -> {
+  Image image = null;
+  try {
+    image = reader.acquireLatestImage();
+    if (image == null) return;
 
-        Image image = null;
-        try {
-            image = reader.acquireLatestImage();
-            if (image == null) {
-                if (pendingResult != null) {
-                    pendingResult.error(new Messages.FlutterError("capturePreviewFrame", "Image is null", null));
-                    pendingResult = null;
-                    frameRequested = false;
-                }
-                return;
-            }
-
-            // Конвертация изображения в jpeg
-            byte[] jpegData = convertYuvToJpeg(image);
-
-            // Отдаём результат в pendingResult и сбрасываем флаг
-            if (pendingResult != null) {
-                pendingResult.success(jpegData);
-                pendingResult = null;
-            }
-        } catch (Exception e) {
-            if (pendingResult != null) {
-                pendingResult.error(new Messages.FlutterError("capturePreviewFrame", e.getMessage(), null));
-                pendingResult = null;
-            }
-        } finally {
-            if (image != null) image.close();
-            frameRequested = false;
-
-        }
+    if (frameMode == FrameCaptureMode.NONE) {
+      // просто закрываем кадр, чтобы не переполнить очередь
+      return;
     }
+
+    byte[] jpeg = convertYuvToJpeg(image);
+
+    switch (frameMode) {
+      case STREAM:
+          mainHandler.post(() -> {
+            if (frameStreamSink != null) {
+              frameStreamSink.success(jpeg);
+            }
+          }); 
+        break;
+
+      case SINGLE:
+        if (pendingFrameResult != null) {
+          pendingFrameResult.success(jpeg);
+          pendingFrameResult = null;
+        }
+        frameMode = FrameCaptureMode.NONE;
+        break;
+    }
+
+  } catch (Exception e) {
+    if (frameMode == FrameCaptureMode.SINGLE && pendingFrameResult != null) {
+      pendingFrameResult.error(new Messages.FlutterError("imageError", e.getMessage(), null));
+      pendingFrameResult = null;
+      frameMode = FrameCaptureMode.NONE;
+    }
+    Log.e(TAG, "Frame error", e);
+  } finally {
+    if (image != null) image.close(); // ✅ обязательно!
+  }
 }, backgroundHandler);
+
 
 
     // Open the camera.
@@ -722,13 +719,34 @@ frameStreamReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableLi
   }
   
 public void capturePreviewFrame(@NonNull Messages.Result<byte[]> result) {
-  requestFrame(result);
+  if (frameMode != FrameCaptureMode.NONE || pendingFrameResult != null) {
+    result.error(new Messages.FlutterError("captureBusy", "Frame already in progress", null));
+    return;
+  }
+  Log.i(TAG, "captureSingleFrame: waiting for one frame");
+  frameMode = FrameCaptureMode.SINGLE;
+  pendingFrameResult = result;
 }
 
-// Метод для запроса кадра
-private void requestFrame(@NonNull Messages.Result<byte[]> result) {
-    frameRequested = true;
-    pendingResult = result;
+public void startListenFrames(@NonNull EventChannel frameStreamChannel) {
+  frameStreamChannel.setStreamHandler(new EventChannel.StreamHandler() {
+    @Override
+    public void onListen(Object arguments, EventChannel.EventSink events) {
+      frameMode = FrameCaptureMode.STREAM;
+      frameStreamSink = events;
+    }
+
+    @Override
+    public void onCancel(Object arguments) {
+      frameMode = FrameCaptureMode.NONE;
+      frameStreamSink = null;
+    }
+  });
+}
+
+public void stopListenFrames() {
+  frameMode = FrameCaptureMode.NONE;
+  frameStreamSink = null;
 }
 
 
@@ -1588,4 +1606,10 @@ private byte[] convertYuvToJpeg(Image image) {
       return new Handler(looper);
     }
   }
+  private enum FrameCaptureMode {
+    NONE,
+    STREAM,
+    SINGLE
+  }
+
 }

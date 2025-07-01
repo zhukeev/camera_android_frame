@@ -21,10 +21,19 @@ This version introduces a new platform method: `capturePreviewFrame()`, which al
 - Internally uses an additional `ImageReader` with YUV format.
 - Converts one preview frame to JPEG on request.
 - Maintains low latency (~10–50ms) compared to `takePicture()`.
+- Avoids interrupting the preview or recording session
 
 ### 🔧 Flutter Usage (via Pigeon)
 
 ```dart
 final data = await cameraController.capturePreviewFrame();
 // `data` is a Uint8List (JPEG encoded image)
+```
+
+### 🔹 startListenFrames() / stopListenFrames
+
+```dart
+   await cameraController.startFrameStream((frame) {
+    // process
+      });
 ```

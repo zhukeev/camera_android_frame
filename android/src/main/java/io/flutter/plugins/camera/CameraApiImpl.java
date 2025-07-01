@@ -30,6 +30,7 @@ final class CameraApiImpl implements Messages.CameraApi {
   private final PermissionsRegistry permissionsRegistry;
   private final TextureRegistry textureRegistry;
   private final EventChannel imageStreamChannel;
+  private final EventChannel framesStreamChannel;
   @VisibleForTesting @Nullable Camera camera;
 
   CameraApiImpl(
@@ -46,6 +47,8 @@ final class CameraApiImpl implements Messages.CameraApi {
 
     imageStreamChannel =
         new EventChannel(messenger, "plugins.flutter.io/camera_android/imageStream");
+    framesStreamChannel =
+        new EventChannel(messenger, "plugins.flutter.io/camera_android/framesStream");
     Messages.CameraApi.setUp(messenger, this);
   }
 
@@ -174,10 +177,21 @@ final class CameraApiImpl implements Messages.CameraApi {
   public void takePicture(@NonNull Messages.Result<String> result) {
     camera.takePicture(result);
   }
-    @Override
+  @Override
   public  void capturePreviewFrame(@NonNull Messages.Result<byte[]> result) {
     camera.capturePreviewFrame(result);
   }
+
+
+  @Override
+  public void startListenFrames() {
+    camera.startListenFrames(framesStreamChannel );
+  }
+@Override
+  public void stopListenFrames() {
+    camera.stopListenFrames();
+  }
+
   @Override
   public void startVideoRecording(@NonNull Boolean enableStream) {
     camera.startVideoRecording(enableStream ? imageStreamChannel : null);

@@ -152,6 +152,12 @@ abstract class CameraApi {
   @async
   Uint8List capturePreviewFrame();
 
+  /// Start listening for preview frames
+  void startListenFrames();
+
+  /// Stop listening for preview frames
+  void stopListenFrames();
+
   /// Starts recording a video on the camera with the given ID.
   void startVideoRecording(bool enableStream);
 
