@@ -961,6 +961,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
 
     try {
       final XFile file = await cameraController.takePicture();
+      final bytes = await cameraController.capturePreviewFrame();
+      print(bytes);
       return file;
     } on CameraException catch (e) {
       _showCameraException(e);

@@ -130,7 +130,7 @@ class Camera
   private volatile boolean frameRequested = false;
 
   // Переменная для хранения результата колбэка
-  private Messages.NullableResult<byte[]> pendingResult = null;
+  private Messages.Result<byte[]> pendingResult = null;
 
   private byte[] lastFrameJpeg;
   private final Object frameLock = new Object();
@@ -721,12 +721,12 @@ frameStreamReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableLi
     }
   }
   
-public void capturePreviewFrame(@NonNull Messages.NullableResult<byte[]> result) {
+public void capturePreviewFrame(@NonNull Messages.Result<byte[]> result) {
   requestFrame(result);
 }
 
 // Метод для запроса кадра
-private void requestFrame(@NonNull Messages.NullableResult<byte[]> result) {
+private void requestFrame(@NonNull Messages.Result<byte[]> result) {
     frameRequested = true;
     pendingResult = result;
 }

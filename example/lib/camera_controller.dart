@@ -280,6 +280,11 @@ class CameraController extends ValueNotifier<CameraValue> {
     return file;
   }
 
+  /// Captures an image and returns the bytes of the image.
+  Future<Uint8List> capturePreviewFrame() async {
+    return CameraPlatform.instance.capturePreviewFrame();
+  }
+
   /// Start streaming images from platform camera.
   Future<void> startImageStream(void Function(CameraImageData image) onAvailable) async {
     _imageStreamSubscription =
