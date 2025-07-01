@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:camera_platform_interface/camera_platform_interface.dart';
+import 'package:camera_platform_interface_frame/camera_platform_interface_frame.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:stream_transform/stream_transform.dart';
@@ -178,7 +178,8 @@ class AndroidCamera extends CameraPlatform {
     return XFile(path);
   }
 
-  Future<Uint8List?> capturePreviewFrame()  {
+  @override
+  Future<Uint8List> capturePreviewFrame() {
     return _hostApi.capturePreviewFrame();
   }
 

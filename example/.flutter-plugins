@@ -1,0 +1,13 @@
+# This is a generated file; do not edit or check into version control.
+camera_android=/Users/argenzhukeev/projects/packages/packages/camera/camera_android/
+flutter_plugin_android_lifecycle=/Users/argenzhukeev/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.22/
+integration_test=/Users/argenzhukeev/fvm/versions/3.27.2/packages/integration_test/
+path_provider=/Users/argenzhukeev/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+path_provider_android=/Users/argenzhukeev/.pub-cache/hosted/pub.dev/path_provider_android-2.2.10/
+path_provider_foundation=/Users/argenzhukeev/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.1/
+path_provider_linux=/Users/argenzhukeev/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+path_provider_windows=/Users/argenzhukeev/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+video_player=/Users/argenzhukeev/.pub-cache/hosted/pub.dev/video_player-2.9.5/
+video_player_android=/Users/argenzhukeev/.pub-cache/hosted/pub.dev/video_player_android-2.7.1/
+video_player_avfoundation=/Users/argenzhukeev/.pub-cache/hosted/pub.dev/video_player_avfoundation-2.7.1/
+video_player_web=/Users/argenzhukeev/.pub-cache/hosted/pub.dev/video_player_web-2.3.5/

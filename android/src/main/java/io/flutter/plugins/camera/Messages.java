@@ -941,7 +941,7 @@ public class Messages {
      */
     void takePicture(@NonNull Result<String> result);
 
-    void capturePreviewFrame(@NonNull NullableResult<byte[]> result);
+    void capturePreviewFrame(@NonNull Result<byte[]> result);
     /** Starts recording a video on the camera with the given ID. */
     void startVideoRecording(@NonNull Boolean enableStream);
     /**
@@ -1193,8 +1193,8 @@ public class Messages {
           channel.setMessageHandler(
               (message, reply) -> {
                 ArrayList<Object> wrapped = new ArrayList<>();
-                NullableResult<byte[]> resultCallback =
-                    new NullableResult<byte[]>() {
+                Result<byte[]> resultCallback =
+                    new Result<byte[]>() {
                       public void success(byte[] result) {
                         wrapped.add(0, result);
                         reply.reply(wrapped);

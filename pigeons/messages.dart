@@ -150,7 +150,7 @@ abstract class CameraApi {
   String takePicture();
   
   @async
-  Uint8List? capturePreviewFrame();
+  Uint8List capturePreviewFrame();
 
   /// Starts recording a video on the camera with the given ID.
   void startVideoRecording(bool enableStream);

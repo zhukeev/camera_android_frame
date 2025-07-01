@@ -531,7 +531,7 @@ class CameraApi {
     }
   }
 
-  Future<Uint8List?> capturePreviewFrame() async {
+  Future<Uint8List> capturePreviewFrame() async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.camera_android.CameraApi.capturePreviewFrame$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
@@ -548,8 +548,13 @@ class CameraApi {
         message: pigeonVar_replyList[1] as String?,
         details: pigeonVar_replyList[2],
       );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
     } else {
-      return (pigeonVar_replyList[0] as Uint8List?);
+      return (pigeonVar_replyList[0] as Uint8List?)!;
     }
   }
 

@@ -175,7 +175,7 @@ final class CameraApiImpl implements Messages.CameraApi {
     camera.takePicture(result);
   }
     @Override
-  public  void capturePreviewFrame(@NonNull Messages.NullableResult<byte[]> result) {
+  public  void capturePreviewFrame(@NonNull Messages.Result<byte[]> result) {
     camera.capturePreviewFrame(result);
   }
   @Override
