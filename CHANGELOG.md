@@ -1,4 +1,4 @@
-## 0.10.10+6
+## 0.10.11
 
 - now `startListenFrames` and `capturePreviewFrame` returns `CameraImageData`
 
