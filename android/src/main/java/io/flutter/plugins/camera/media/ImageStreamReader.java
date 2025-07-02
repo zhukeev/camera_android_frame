@@ -96,23 +96,7 @@ public class ImageStreamReader {
       @NonNull CameraCaptureProperties captureProps,
       @NonNull EventChannel.EventSink imageStreamSink) {
     try {
-      Map<String, Object> imageBuffer = new HashMap<>();
-
-      // Get plane data ready
-      if (dartImageFormat == ImageFormat.NV21) {
-        imageBuffer.put("planes", parsePlanesForNv21(image));
-      } else {
-        imageBuffer.put("planes", parsePlanesForYuvOrJpeg(image));
-      }
-
-      imageBuffer.put("width", image.getWidth());
-      imageBuffer.put("height", image.getHeight());
-      imageBuffer.put("format", dartImageFormat);
-      imageBuffer.put("lensAperture", captureProps.getLastLensAperture());
-      imageBuffer.put("sensorExposureTime", captureProps.getLastSensorExposureTime());
-      Integer sensorSensitivity = captureProps.getLastSensorSensitivity();
-      imageBuffer.put(
-          "sensorSensitivity", sensorSensitivity == null ? null : (double) sensorSensitivity);
+      final Map<String, Object> imageBuffer = decodeImage(image, captureProps, dartImageFormat, imageStreamReaderUtils);
 
       final Handler handler = new Handler(Looper.getMainLooper());
       handler.post(() -> imageStreamSink.success(imageBuffer));
@@ -130,6 +114,53 @@ public class ImageStreamReader {
       image.close();
     }
   }
+
+public static Map<String, Object> decodeImage(
+    @NonNull Image image,
+    @NonNull CameraCaptureProperties captureProps,
+    int imageFormat,
+    @NonNull ImageStreamReaderUtils imageUtils) {
+  try {
+    Map<String, Object> imageBuffer = new HashMap<>();
+
+    // Get plane data ready
+    if (imageFormat == ImageFormat.NV21) {
+      ByteBuffer bytes =
+          imageUtils.yuv420ThreePlanesToNV21(image.getPlanes(), image.getWidth(), image.getHeight());
+      Map<String, Object> plane = new HashMap<>();
+      plane.put("bytesPerRow", image.getWidth());
+      plane.put("bytesPerPixel", 1);
+      plane.put("bytes", bytes.array());
+      imageBuffer.put("planes", List.of(plane));
+    } else {
+      List<Map<String, Object>> planes = new ArrayList<>();
+      for (Image.Plane plane : image.getPlanes()) {
+        ByteBuffer buffer = plane.getBuffer();
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        Map<String, Object> planeMap = new HashMap<>();
+        planeMap.put("bytesPerRow", plane.getRowStride());
+        planeMap.put("bytesPerPixel", plane.getPixelStride());
+        planeMap.put("bytes", bytes);
+        planes.add(planeMap);
+      }
+      imageBuffer.put("planes", planes);
+    }
+
+    imageBuffer.put("width", image.getWidth());
+    imageBuffer.put("height", image.getHeight());
+    imageBuffer.put("format", imageFormat);
+    imageBuffer.put("lensAperture", captureProps.getLastLensAperture());
+    imageBuffer.put("sensorExposureTime", captureProps.getLastSensorExposureTime());
+    Integer sensorSensitivity = captureProps.getLastSensorSensitivity();
+    imageBuffer.put("sensorSensitivity", sensorSensitivity == null ? null : (double) sensorSensitivity);
+
+    return imageBuffer;
+  } catch (IllegalStateException e) {
+    throw new IllegalStateException("Caught IllegalStateException: " + e.getMessage());
+  }
+}
+
 
   /**
    * Given an input image, will return a list of maps suitable to send back to dart where each map

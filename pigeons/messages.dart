@@ -19,10 +19,7 @@ enum PlatformCameraLensDirection {
 
 /// Pigeon equivalent of [CameraDescription].
 class PlatformCameraDescription {
-  PlatformCameraDescription(
-      {required this.name,
-      required this.lensDirection,
-      required this.sensorOrientation});
+  PlatformCameraDescription({required this.name, required this.lensDirection, required this.sensorOrientation});
 
   final String name;
   final PlatformCameraLensDirection lensDirection;
@@ -94,11 +91,7 @@ enum PlatformResolutionPreset {
 /// Pigeon equivalent of [MediaSettings].
 class PlatformMediaSettings {
   PlatformMediaSettings(
-      {required this.resolutionPreset,
-      required this.enableAudio,
-      this.fps,
-      this.videoBitrate,
-      this.audioBitrate});
+      {required this.resolutionPreset, required this.enableAudio, this.fps, this.videoBitrate, this.audioBitrate});
   final PlatformResolutionPreset resolutionPreset;
   final int? fps;
   final int? videoBitrate;
@@ -148,9 +141,9 @@ abstract class CameraApi {
   /// resulting file.
   @async
   String takePicture();
-  
+
   @async
-  Uint8List capturePreviewFrame();
+  Map<String, Object> capturePreviewFrame();
 
   /// Start listening for preview frames
   void startListenFrames();

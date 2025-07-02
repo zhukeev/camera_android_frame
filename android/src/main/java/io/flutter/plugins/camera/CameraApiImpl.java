@@ -22,6 +22,7 @@ import io.flutter.plugins.camera.features.resolution.ResolutionPreset;
 import io.flutter.view.TextureRegistry;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 final class CameraApiImpl implements Messages.CameraApi {
   private final Activity activity;
@@ -178,10 +179,9 @@ final class CameraApiImpl implements Messages.CameraApi {
     camera.takePicture(result);
   }
   @Override
-  public  void capturePreviewFrame(@NonNull Messages.Result<byte[]> result) {
+  public  void capturePreviewFrame(@NonNull Messages.Result<Map<String, Object>> result) {
     camera.capturePreviewFrame(result);
   }
-
 
   @Override
   public void startListenFrames() {

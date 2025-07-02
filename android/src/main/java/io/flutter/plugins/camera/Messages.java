@@ -941,7 +941,7 @@ public class Messages {
      */
     void takePicture(@NonNull Result<String> result);
 
-    void capturePreviewFrame(@NonNull Result<byte[]> result);
+    void capturePreviewFrame(@NonNull Result<Map<String, Object>> result);
     /** Start listening for preview frames */
     void startListenFrames();
     /** Stop listening for preview frames */
@@ -1197,9 +1197,9 @@ public class Messages {
           channel.setMessageHandler(
               (message, reply) -> {
                 ArrayList<Object> wrapped = new ArrayList<>();
-                Result<byte[]> resultCallback =
-                    new Result<byte[]>() {
-                      public void success(byte[] result) {
+                Result<Map<String, Object>> resultCallback =
+                    new Result<Map<String, Object>>() {
+                      public void success(Map<String, Object> result) {
                         wrapped.add(0, result);
                         reply.reply(wrapped);
                       }

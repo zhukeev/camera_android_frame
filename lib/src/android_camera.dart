@@ -60,7 +60,7 @@ class AndroidCamera extends CameraPlatform {
   StreamSubscription<dynamic>? _platformFramesStreamSubscription;
 
   // The stream for vending frames to platform interface clients.
-  StreamController<Uint8List>? _framesStreamController;
+  StreamController<CameraImageData>? _framesStreamController;
 
   Stream<CameraEvent> _cameraEvents(int cameraId) =>
       cameraEventStreamController.stream.where((CameraEvent event) => event.cameraId == cameraId);
@@ -185,12 +185,13 @@ class AndroidCamera extends CameraPlatform {
   }
 
   @override
-  Future<Uint8List> capturePreviewFrame() {
-    return _hostApi.capturePreviewFrame();
+  Future<CameraImageData> capturePreviewFrame() async {
+    final imageData = await _hostApi.capturePreviewFrame();
+    return cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>);
   }
 
   @override
-  Future<void> startListenFrames(void Function(Uint8List image)? frameCallback) async {
+  Future<void> startListenFrames({void Function(CameraImageData image)? frameCallback}) async {
     await _hostApi.startListenFrames();
     _startFramesStreamListener();
     _installFramesStreamController().stream.listen(frameCallback);
@@ -252,8 +253,8 @@ class AndroidCamera extends CameraPlatform {
     return _frameStreamController!;
   }
 
-  StreamController<Uint8List> _installFramesStreamController({void Function()? onListen}) {
-    _framesStreamController = StreamController<Uint8List>(
+  StreamController<CameraImageData> _installFramesStreamController({void Function()? onListen}) {
+    _framesStreamController = StreamController<CameraImageData>(
       onListen: onListen ?? () {},
       onPause: _onFramesStreamPauseResume,
       onResume: _onFramesStreamPauseResume,
@@ -280,8 +281,8 @@ class AndroidCamera extends CameraPlatform {
 
   void _startFramesStreamListener() {
     const EventChannel framesEventChannel = EventChannel('plugins.flutter.io/camera_android/framesStream');
-    _platformImageStreamSubscription = framesEventChannel.receiveBroadcastStream().listen((dynamic frame) {
-      _framesStreamController!.add(frame as Uint8List);
+    _platformImageStreamSubscription = framesEventChannel.receiveBroadcastStream().listen((dynamic imageData) {
+      _framesStreamController!.add(cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>));
     });
   }
 

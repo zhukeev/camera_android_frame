@@ -1,3 +1,7 @@
+## 0.10.10+6
+
+- now `startListenFrames` and `capturePreviewFrame` returns `CameraImageData`
+
 ## 0.10.10+5
 
 - New methods: `startListenFrames`, `stopListenFrames`

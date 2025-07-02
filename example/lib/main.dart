@@ -576,7 +576,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
         resolutionPreset: kIsWeb ? ResolutionPreset.max : ResolutionPreset.medium,
         enableAudio: enableAudio,
       ),
-      imageFormatGroup: ImageFormatGroup.jpeg,
+      imageFormatGroup: ImageFormatGroup.nv21,
     );
 
     controller = cameraController;
@@ -962,8 +962,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
     try {
       final XFile file = await cameraController.takePicture();
       final sw = Stopwatch()..start();
-       await cameraController.capturePreviewFrame();
-      print('frame took ${sw.elapsedMilliseconds} ms');
+      final frame = await cameraController.capturePreviewFrame();
+      print('first frame took ${sw.elapsedMilliseconds} ms ${frame.width}x${frame.height}');
 
       DateTime lastTime = DateTime.now();
 
@@ -973,7 +973,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
       });
 
       await cameraController.startFrameStream((frame) {
-        print('frame took ${DateTime.now().difference(lastTime).inMilliseconds} ms ${frame.length} bytes');
+        print('frame took ${DateTime.now().difference(lastTime).inMilliseconds} ms ${frame.width}x${frame.height}');
         lastTime = DateTime.now();
       });
       print('frame took ${sw.elapsedMilliseconds} ms');

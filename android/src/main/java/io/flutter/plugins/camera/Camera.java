@@ -38,6 +38,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import io.flutter.BuildConfig;
 import io.flutter.embedding.engine.systemchannels.PlatformChannel;
+import io.flutter.plugins.camera.media.ImageStreamReaderUtils;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugins.camera.features.CameraFeature;
 import io.flutter.plugins.camera.features.CameraFeatureFactory;
@@ -72,6 +73,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -130,7 +132,7 @@ class Camera
 
   private EventChannel.EventSink frameStreamSink = null;
   private volatile FrameCaptureMode frameMode = FrameCaptureMode.NONE;
-  private Messages.Result<byte[]> pendingFrameResult = null;
+  private Messages.Result<Map<String, Object>> pendingFrameResult = null;
 
   private byte[] lastFrameJpeg;
   private final Object frameLock = new Object();
@@ -381,7 +383,7 @@ class Camera
         ImageReader.newInstance(
             resolutionFeature.getPreviewSize().getWidth(),
             resolutionFeature.getPreviewSize().getHeight(),
-            ImageFormat.YUV_420_888,
+          ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
             2);
 
 frameStreamReader.setOnImageAvailableListener(reader -> {
@@ -395,20 +397,20 @@ frameStreamReader.setOnImageAvailableListener(reader -> {
       return;
     }
 
-    byte[] jpeg = convertYuvToJpeg(image);
-
+    final Map<String, Object> imageBuffer = ImageStreamReader.decodeImage(image, this.captureProps,    ImageStreamReader.computeStreamImageFormat(imageFormatGroup), new ImageStreamReaderUtils());
+    
     switch (frameMode) {
       case STREAM:
           mainHandler.post(() -> {
             if (frameStreamSink != null) {
-              frameStreamSink.success(jpeg);
+              frameStreamSink.success(imageBuffer);
             }
           }); 
         break;
 
       case SINGLE:
         if (pendingFrameResult != null) {
-          pendingFrameResult.success(jpeg);
+          pendingFrameResult.success(imageBuffer);
           pendingFrameResult = null;
         }
         frameMode = FrameCaptureMode.NONE;
@@ -423,7 +425,7 @@ frameStreamReader.setOnImageAvailableListener(reader -> {
     }
     Log.e(TAG, "Frame error", e);
   } finally {
-    if (image != null) image.close(); // ✅ обязательно!
+    if (image != null) image.close();
   }
 }, backgroundHandler);
 
@@ -718,7 +720,7 @@ frameStreamReader.setOnImageAvailableListener(reader -> {
     }
   }
   
-public void capturePreviewFrame(@NonNull Messages.Result<byte[]> result) {
+public void capturePreviewFrame(@NonNull Messages.Result<Map<String, Object>> result) {
   if (frameMode != FrameCaptureMode.NONE || pendingFrameResult != null) {
     result.error(new Messages.FlutterError("captureBusy", "Frame already in progress", null));
     return;
@@ -747,52 +749,6 @@ public void startListenFrames(@NonNull EventChannel frameStreamChannel) {
 public void stopListenFrames() {
   frameMode = FrameCaptureMode.NONE;
   frameStreamSink = null;
-}
-
-
-private byte[] convertYuvToJpeg(Image image) {
-    int width = image.getWidth();
-    int height = image.getHeight();
-
-    // Получаем все плоскости
-    Image.Plane[] planes = image.getPlanes();
-    ByteBuffer yPlane = planes[0].getBuffer();
-    ByteBuffer uPlane = planes[1].getBuffer();
-    ByteBuffer vPlane = planes[2].getBuffer();
-
-    int ySize = yPlane.remaining();
-    int uSize = uPlane.remaining();
-    int vSize = vPlane.remaining();
-
-    byte[] nv21 = new byte[width * height * 3 / 2];
-
-    // Y
-    yPlane.get(nv21, 0, ySize);
-
-    // U и V перемешаны (VU порядок) — для NV21
-    int chromaRowStride = planes[1].getRowStride();
-    int chromaPixelStride = planes[1].getPixelStride();
-
-    byte[] uBytes = new byte[uSize];
-    byte[] vBytes = new byte[vSize];
-    uPlane.get(uBytes);
-    vPlane.get(vBytes);
-
-    int offset = ySize;
-    for (int row = 0; row < height / 2; row++) {
-        for (int col = 0; col < width / 2; col++) {
-            int uvIndex = row * chromaRowStride + col * chromaPixelStride;
-            // В порядке VU для NV21
-            nv21[offset++] = vBytes[uvIndex];
-            nv21[offset++] = uBytes[uvIndex];
-        }
-    }
-
-    // Конвертируем NV21 в JPEG
-    YuvImage yuvImage = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    yuvImage.compressToJpeg(new Rect(0, 0, width, height), 90, out);
-    return out.toByteArray();
 }
 
 
