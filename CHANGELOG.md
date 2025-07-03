@@ -1,3 +1,7 @@
+## 0.10.12
+
+- caching frames
+
 ## 0.10.11
 
 - now `startListenFrames` and `capturePreviewFrame` returns `CameraImageData`
