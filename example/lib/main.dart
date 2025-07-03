@@ -963,7 +963,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
       final XFile file = await cameraController.takePicture();
       final sw = Stopwatch()..start();
       final frame = await cameraController.capturePreviewFrame();
-      print('first frame took ${sw.elapsedMilliseconds} ms ${frame.width}x${frame.height}');
+      print('first frame took ${sw.elapsedMilliseconds} ms ${frame.width}x${frame.height} ${frame.planes.first.bytes}');
 
       DateTime lastTime = DateTime.now();
 

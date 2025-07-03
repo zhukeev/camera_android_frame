@@ -131,11 +131,9 @@ class Camera
   private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
   private EventChannel.EventSink frameStreamSink = null;
-  private volatile FrameCaptureMode frameMode = FrameCaptureMode.NONE;
-  private Messages.Result<Map<String, Object>> pendingFrameResult = null;
+  private boolean isStreamingFrames = false;
+  private  Map<String, Object> imageBuffer = null;
 
-  private byte[] lastFrameJpeg;
-  private final Object frameLock = new Object();
   /** {@link CaptureRequest.Builder} for the camera preview */
   CaptureRequest.Builder previewRequestBuilder;
 
@@ -386,42 +384,28 @@ class Camera
           ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
             2);
 
+final ImageStreamReaderUtils imageStreamReaderUtils = new ImageStreamReaderUtils();
 frameStreamReader.setOnImageAvailableListener(reader -> {
   Image image = null;
   try {
     image = reader.acquireLatestImage();
     if (image == null) return;
 
-    if (frameMode == FrameCaptureMode.NONE) {
-      // просто закрываем кадр, чтобы не переполнить очередь
-      return;
-    }
+    imageBuffer = ImageStreamReader.decodeImage(image, this.captureProps,    ImageStreamReader.computeStreamImageFormat(imageFormatGroup), imageStreamReaderUtils);
 
-    final Map<String, Object> imageBuffer = ImageStreamReader.decodeImage(image, this.captureProps,    ImageStreamReader.computeStreamImageFormat(imageFormatGroup), new ImageStreamReaderUtils());
-    
-    switch (frameMode) {
-      case STREAM:
-          mainHandler.post(() -> {
-            if (frameStreamSink != null) {
-              frameStreamSink.success(imageBuffer);
-            }
-          }); 
-        break;
-
-      case SINGLE:
-        if (pendingFrameResult != null) {
-          pendingFrameResult.success(imageBuffer);
-          pendingFrameResult = null;
+    if(isStreamingFrames){
+      mainHandler.post(() -> {
+        if (frameStreamSink != null) {
+          frameStreamSink.success(imageBuffer);
         }
-        frameMode = FrameCaptureMode.NONE;
-        break;
+      });
     }
-
   } catch (Exception e) {
-    if (frameMode == FrameCaptureMode.SINGLE && pendingFrameResult != null) {
-      pendingFrameResult.error(new Messages.FlutterError("imageError", e.getMessage(), null));
-      pendingFrameResult = null;
-      frameMode = FrameCaptureMode.NONE;
+    if (isStreamingFrames) {
+      frameStreamSink.error(
+                  "Exception",
+                  "Caught Exception: " + e.getMessage(),
+                  null);
     }
     Log.e(TAG, "Frame error", e);
   } finally {
@@ -720,34 +704,33 @@ frameStreamReader.setOnImageAvailableListener(reader -> {
     }
   }
   
-public void capturePreviewFrame(@NonNull Messages.Result<Map<String, Object>> result) {
-  if (frameMode != FrameCaptureMode.NONE || pendingFrameResult != null) {
-    result.error(new Messages.FlutterError("captureBusy", "Frame already in progress", null));
-    return;
+  public void capturePreviewFrame(@NonNull Messages.Result<Map<String, Object>> result) {
+  if (imageBuffer != null) {
+    result.success(imageBuffer);
+  } else {
+    result.error(new Messages.FlutterError("noImage", "No frame captured yet", null));
   }
-  Log.i(TAG, "captureSingleFrame: waiting for one frame");
-  frameMode = FrameCaptureMode.SINGLE;
-  pendingFrameResult = result;
 }
+
 
 public void startListenFrames(@NonNull EventChannel frameStreamChannel) {
   frameStreamChannel.setStreamHandler(new EventChannel.StreamHandler() {
     @Override
     public void onListen(Object arguments, EventChannel.EventSink events) {
-      frameMode = FrameCaptureMode.STREAM;
+      isStreamingFrames = true;
       frameStreamSink = events;
     }
 
     @Override
     public void onCancel(Object arguments) {
-      frameMode = FrameCaptureMode.NONE;
+      isStreamingFrames = false;
       frameStreamSink = null;
     }
   });
 }
 
 public void stopListenFrames() {
-  frameMode = FrameCaptureMode.NONE;
+  isStreamingFrames = false;
   frameStreamSink = null;
 }
 
