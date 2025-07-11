@@ -189,6 +189,11 @@ class AndroidCamera extends CameraPlatform {
     final imageData = await _hostApi.capturePreviewFrame();
     return cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>);
   }
+  @override
+  Future<XFile> capturePreviewFrameJpeg(String outputPath) async {
+    final path = await _hostApi.capturePreviewFrameJpeg(outputPath);
+    return XFile(path);
+  }
 
   @override
   Future<void> startListenFrames({void Function(CameraImageData image)? frameCallback}) async {

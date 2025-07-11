@@ -182,6 +182,10 @@ final class CameraApiImpl implements Messages.CameraApi {
   public  void capturePreviewFrame(@NonNull Messages.Result<Map<String, Object>> result) {
     camera.capturePreviewFrame(result);
   }
+  @Override
+ public void capturePreviewFrameJpeg(@NonNull String outputPath, @NonNull Messages.Result<String> result) {
+    camera.capturePreviewFrameJpeg(outputPath,result);
+  }
 
   @Override
   public void startListenFrames() {

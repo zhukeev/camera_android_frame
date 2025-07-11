@@ -1,9 +1,9 @@
 name: camera_android_frame
 description: Android implementation of the camera plugin.
-repository: https://github.com/flutter/packages/tree/main/packages/camera/camera_android
-issue_tracker: https://github.com/flutter/flutter/issues?q=is%3Aissue+is%3Aopen+label%3A%22p%3A+camera%22
+repository: https://github.com/zhukeev/camera_android_frame
+issue_tracker: https://github.com/zhukeev/camera_android_frame/issues
 
-version: 0.10.12
+version: 0.10.13
 
 environment:
   sdk: ^3.6.0
@@ -19,7 +19,7 @@ flutter:
         dartPluginClass: AndroidCamera
 
 dependencies:
-  camera_platform_interface_frame: ^2.10.4
+  camera_platform_interface_frame: ^2.10.5
   flutter:
     sdk: flutter
   flutter_plugin_android_lifecycle: ^2.0.2

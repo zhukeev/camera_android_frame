@@ -942,6 +942,8 @@ public class Messages {
     void takePicture(@NonNull Result<String> result);
 
     void capturePreviewFrame(@NonNull Result<Map<String, Object>> result);
+
+    void capturePreviewFrameJpeg(@NonNull String outputPath, @NonNull Result<String> result);
     /** Start listening for preview frames */
     void startListenFrames();
     /** Stop listening for preview frames */
@@ -1211,6 +1213,35 @@ public class Messages {
                     };
 
                 api.capturePreviewFrame(resultCallback);
+              });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(
+                binaryMessenger, "dev.flutter.pigeon.camera_android_frame.CameraApi.capturePreviewFrameJpeg" + messageChannelSuffix, getCodec());
+        if (api != null) {
+          channel.setMessageHandler(
+              (message, reply) -> {
+                ArrayList<Object> wrapped = new ArrayList<>();
+                ArrayList<Object> args = (ArrayList<Object>) message;
+                String outputPathArg = (String) args.get(0);
+                Result<String> resultCallback =
+                    new Result<String>() {
+                      public void success(String result) {
+                        wrapped.add(0, result);
+                        reply.reply(wrapped);
+                      }
+
+                      public void error(Throwable error) {
+                        ArrayList<Object> wrappedError = wrapError(error);
+                        reply.reply(wrappedError);
+                      }
+                    };
+
+                api.capturePreviewFrameJpeg(outputPathArg, resultCallback);
               });
         } else {
           channel.setMessageHandler(null);

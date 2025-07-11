@@ -558,6 +558,33 @@ class CameraApi {
     }
   }
 
+  Future<String> capturePreviewFrameJpeg(String outputPath) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.camera_android_frame.CameraApi.capturePreviewFrameJpeg$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_channel.send(<Object?>[outputPath]) as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as String?)!;
+    }
+  }
+
   /// Start listening for preview frames
   Future<void> startListenFrames() async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.camera_android_frame.CameraApi.startListenFrames$pigeonVar_messageChannelSuffix';

@@ -3,12 +3,17 @@
 // found in the LICENSE file.
 
 package io.flutter.plugins.camera;
+import android.os.SystemClock;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.ImageFormat;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import android.graphics.YuvImage;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -74,6 +79,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -128,11 +136,11 @@ class Camera
   @VisibleForTesting ImageReader pictureImageReader;
   ImageStreamReader imageStreamReader;
   ImageReader frameStreamReader;
-  private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
   private EventChannel.EventSink frameStreamSink = null;
   private boolean isStreamingFrames = false;
-  private  Map<String, Object> imageBuffer = null;
+  final ImageStreamReaderUtils imageStreamReaderUtils = new ImageStreamReaderUtils();
+  private volatile Image lastImage = null;
 
   /** {@link CaptureRequest.Builder} for the camera preview */
   CaptureRequest.Builder previewRequestBuilder;
@@ -384,33 +392,57 @@ class Camera
           ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
             2);
 
-final ImageStreamReaderUtils imageStreamReaderUtils = new ImageStreamReaderUtils();
 frameStreamReader.setOnImageAvailableListener(reader -> {
-  Image image = null;
-  try {
-    image = reader.acquireLatestImage();
-    if (image == null) return;
+        Image image;
 
-    imageBuffer = ImageStreamReader.decodeImage(image, this.captureProps,    ImageStreamReader.computeStreamImageFormat(imageFormatGroup), imageStreamReaderUtils);
-
-    if(isStreamingFrames){
-      mainHandler.post(() -> {
-        if (frameStreamSink != null) {
-          frameStreamSink.success(imageBuffer);
+    try {
+         image = reader.acquireNextImage();
+        if (image == null) {
+            return;
         }
-      });
+
+           synchronized (this) {
+            if (lastImage != null) {
+                try {
+                    lastImage.close();
+                } catch (Exception e) {
+                    Log.w(TAG, "Failed to close previous lastImage", e);
+                }
+            }
+            lastImage = image;
+            this.notifyAll();
+        }
+
+            try {
+                if (isStreamingFrames) {
+                   Map<String, Object> imageBuffer = ImageStreamReader.decodeImage(
+                        image,
+                        this.captureProps,
+                        ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
+                        imageStreamReaderUtils
+                );
+                    Map<String, Object> bufferCopy = imageBuffer;
+                    backgroundHandler.post(() -> {
+                        if (frameStreamSink != null) {
+                            frameStreamSink.success(bufferCopy);
+                        }
+                    });
+                }else {
+            synchronized (this) {
+                if (lastImage != image) {
+                    image.close(); 
+                }
+            }
+        }
+            } catch (Exception e) {
+                Log.e(TAG, "decodeImage failed", e);
+            } 
+    } catch (Exception e) {
+        if (isStreamingFrames) {
+            frameStreamSink.error("Exception", "Caught Exception: " + e.getMessage(), null);
+        }
+        Log.e(TAG, "Frame error", e);
     }
-  } catch (Exception e) {
-    if (isStreamingFrames) {
-      frameStreamSink.error(
-                  "Exception",
-                  "Caught Exception: " + e.getMessage(),
-                  null);
-    }
-    Log.e(TAG, "Frame error", e);
-  } finally {
-    if (image != null) image.close();
-  }
 }, backgroundHandler);
 
 
@@ -704,13 +736,81 @@ frameStreamReader.setOnImageAvailableListener(reader -> {
     }
   }
   
-  public void capturePreviewFrame(@NonNull Messages.Result<Map<String, Object>> result) {
-  if (imageBuffer != null) {
-    result.success(imageBuffer);
-  } else {
-    result.error(new Messages.FlutterError("noImage", "No frame captured yet", null));
-  }
+@Nullable
+private Image acquireLatestImageBlocking(Messages.Result<?> result) {
+    synchronized (this) {
+        long startTime = System.currentTimeMillis();
+        while (lastImage == null && System.currentTimeMillis() - startTime < 500) {
+            try {
+                this.wait(50);
+            } catch (InterruptedException e) {
+                result.error(new Messages.FlutterError("interrupted", e.getMessage(), null));
+                return null;
+            }
+        }
+
+        if (lastImage == null) {
+            result.error(new Messages.FlutterError("noImage", "No image available", null));
+            return null;
+        }
+
+        Image imageToSave = lastImage;
+        lastImage = null;
+        return imageToSave;
+    }
 }
+
+private void saveJpegFromNV21(byte[] nv21Bytes, int width, int height, String outputPath) throws IOException {
+    YuvImage yuvImage = new YuvImage(nv21Bytes, ImageFormat.NV21, width, height, null);
+    try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+        Rect rect = new Rect(0, 0, width, height);
+        yuvImage.compressToJpeg(rect, 90, fos);
+    }
+}
+
+
+
+  public void capturePreviewFrame(@NonNull Messages.Result<Map<String, Object>> result) {
+    Image imageToSave = acquireLatestImageBlocking(result);
+    if (imageToSave == null) return;
+
+    Map<String, Object> imageBuffer = ImageStreamReader.decodeImage(
+        imageToSave,
+        this.captureProps,
+        ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
+        imageStreamReaderUtils
+    );
+
+    imageToSave.close();
+
+    backgroundHandler.post(() -> result.success(imageBuffer));
+}
+
+public void capturePreviewFrameJpeg(@NonNull String outputPath, @NonNull Messages.Result<String> result) {
+    Image imageToSave = acquireLatestImageBlocking(result);
+    if (imageToSave == null) return;
+
+    final int width = imageToSave.getWidth();
+    final int height = imageToSave.getHeight();
+    final ByteBuffer resultBuffer = imageStreamReaderUtils.yuv420ThreePlanesToNV21(
+        imageToSave.getPlanes(), width, height
+    );
+
+    resultBuffer.rewind();
+    byte[] nv21Bytes = new byte[resultBuffer.remaining()];
+    resultBuffer.get(nv21Bytes);
+    imageToSave.close();
+
+    backgroundHandler.post(() -> {
+        try {
+            saveJpegFromNV21(nv21Bytes, width, height, outputPath);
+            result.success(outputPath);
+        } catch (IOException e) {
+            result.error(new Messages.FlutterError("save_failed", e.getMessage(), null));
+        }
+    });
+}
+
 
 
 public void startListenFrames(@NonNull EventChannel frameStreamChannel) {

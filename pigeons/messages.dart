@@ -142,8 +142,13 @@ abstract class CameraApi {
   @async
   String takePicture();
 
+  // Capture a preview frame and return it as a map
   @async
   Map<String, Object> capturePreviewFrame();
+
+  // Capture a preview frame and return it as a jpeg
+  @async
+  String capturePreviewFrameJpeg(String outputPath);
 
   /// Start listening for preview frames
   void startListenFrames();

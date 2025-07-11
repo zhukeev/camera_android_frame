@@ -1,4 +1,9 @@
-## 0.10.12
+## 0.10.13
+
+- Added `capturePreviewFrameJpeg(String path)` method to capture a single JPEG preview frame.
+- Introduced internal `ImageReader` buffer management to support non-intrusive frame access.
+
+# 0.10.12
 
 - caching frames
 
