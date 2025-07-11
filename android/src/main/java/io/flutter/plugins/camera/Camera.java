@@ -1524,6 +1524,10 @@ public void stopListenFrames() {
       imageStreamReader.close();
       imageStreamReader = null;
     }
+     if (frameStreamReader != null) {
+      frameStreamReader.close();
+      frameStreamReader = null;
+    }
     if (mediaRecorder != null) {
       mediaRecorder.reset();
       mediaRecorder.release();
