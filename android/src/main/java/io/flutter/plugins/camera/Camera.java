@@ -139,6 +139,7 @@ class Camera
 
   private EventChannel.EventSink frameStreamSink = null;
   private boolean isStreamingFrames = false;
+  private boolean isCapturingFrame = false;
   final ImageStreamReaderUtils imageStreamReaderUtils = new ImageStreamReaderUtils();
   private volatile Image lastImage = null;
 
@@ -392,7 +393,7 @@ class Camera
           ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
             2);
 
-frameStreamReader.setOnImageAvailableListener(reader -> {
+    frameStreamReader.setOnImageAvailableListener(reader -> {
         Image image;
 
     try {
@@ -402,7 +403,7 @@ frameStreamReader.setOnImageAvailableListener(reader -> {
         }
 
            synchronized (this) {
-            if (lastImage != null) {
+            if (!isCapturingFrame && lastImage != null) {
                 try {
                     lastImage.close();
                 } catch (Exception e) {
@@ -411,7 +412,7 @@ frameStreamReader.setOnImageAvailableListener(reader -> {
             }
             lastImage = image;
             this.notifyAll();
-        }
+          }
 
             try {
                 if (isStreamingFrames) {
@@ -443,7 +444,7 @@ frameStreamReader.setOnImageAvailableListener(reader -> {
         }
         Log.e(TAG, "Frame error", e);
     }
-}, backgroundHandler);
+  }, backgroundHandler);
 
 
 
@@ -736,43 +737,47 @@ frameStreamReader.setOnImageAvailableListener(reader -> {
     }
   }
   
-@Nullable
-private Image acquireLatestImageBlocking(Messages.Result<?> result) {
-    synchronized (this) {
-        long startTime = System.currentTimeMillis();
-        while (lastImage == null && System.currentTimeMillis() - startTime < 500) {
-            try {
-                this.wait(50);
-            } catch (InterruptedException e) {
-                result.error(new Messages.FlutterError("interrupted", e.getMessage(), null));
-                return null;
-            }
-        }
+  @Nullable
+  private Image acquireLatestImageBlocking(Messages.Result<?> result) {
+      synchronized (this) {
+          long startTime = System.currentTimeMillis();
+          while (lastImage == null && System.currentTimeMillis() - startTime < 500) {
+              try {
+                  this.wait(50);
+              } catch (InterruptedException e) {
+                  result.error(new Messages.FlutterError("interrupted", e.getMessage(), null));
+                  return null;
+              }
+          }
 
-        if (lastImage == null) {
-            result.error(new Messages.FlutterError("noImage", "No image available", null));
-            return null;
-        }
+          if (lastImage == null) {
+              result.error(new Messages.FlutterError("noImage", "No image available", null));
+              return null;
+          }
 
-        Image imageToSave = lastImage;
-        lastImage = null;
-        return imageToSave;
-    }
-}
+          Image imageToSave = lastImage;
+          lastImage = null;
+          return imageToSave;
+      }
+  }
 
-private void saveJpegFromNV21(byte[] nv21Bytes, int width, int height, String outputPath) throws IOException {
-    YuvImage yuvImage = new YuvImage(nv21Bytes, ImageFormat.NV21, width, height, null);
-    try (FileOutputStream fos = new FileOutputStream(outputPath)) {
-        Rect rect = new Rect(0, 0, width, height);
-        yuvImage.compressToJpeg(rect, 90, fos);
-    }
-}
+  private void saveJpegFromNV21(byte[] nv21Bytes, int width, int height, String outputPath) throws IOException {
+      YuvImage yuvImage = new YuvImage(nv21Bytes, ImageFormat.NV21, width, height, null);
+      try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+          Rect rect = new Rect(0, 0, width, height);
+          yuvImage.compressToJpeg(rect, 90, fos);
+      }
+  }
 
 
 
   public void capturePreviewFrame(@NonNull Messages.Result<Map<String, Object>> result) {
+    isCapturingFrame = true;
     Image imageToSave = acquireLatestImageBlocking(result);
-    if (imageToSave == null) return;
+      if (imageToSave == null) {
+        isCapturingFrame = false;
+        return;
+      }
 
     Map<String, Object> imageBuffer = ImageStreamReader.decodeImage(
         imageToSave,
@@ -782,9 +787,10 @@ private void saveJpegFromNV21(byte[] nv21Bytes, int width, int height, String ou
     );
 
     imageToSave.close();
+    isCapturingFrame = false;
 
     backgroundHandler.post(() -> result.success(imageBuffer));
-}
+  }
 
 public void capturePreviewFrameJpeg(@NonNull String outputPath, @NonNull Messages.Result<String> result) {
     Image imageToSave = acquireLatestImageBlocking(result);
