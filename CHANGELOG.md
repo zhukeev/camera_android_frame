@@ -1,3 +1,7 @@
+## 0.10.15
+
+- updated camera_platform_interface_frame
+
 ## 0.10.14
 
 - Implemented `saveAsJpeg(Map<String, Object> imageData, String outputPath, int rotationDegrees, Result<String> result)` method:
