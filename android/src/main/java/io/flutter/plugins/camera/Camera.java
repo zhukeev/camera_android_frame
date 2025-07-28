@@ -9,11 +9,9 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.ImageFormat;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import android.graphics.YuvImage;
-import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -26,10 +24,12 @@ import android.hardware.camera2.params.OutputConfiguration;
 import android.hardware.camera2.params.SessionConfiguration;
 import android.media.CamcorderProfile;
 import android.media.EncoderProfiles;
-import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.os.Build.VERSION_CODES;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -69,7 +69,6 @@ import io.flutter.plugins.camera.types.CameraCaptureProperties;
 import io.flutter.plugins.camera.types.CaptureTimeoutsWrapper;
 import io.flutter.view.TextureRegistry.SurfaceTextureEntry;
 import android.graphics.Rect;
-import android.graphics.YuvImage;
 import android.graphics.ImageFormat;
 import java.io.ByteArrayOutputStream;
 import android.media.Image;
@@ -141,6 +140,7 @@ class Camera
   private boolean isStreamingFrames = false;
   private boolean isCapturingFrame = false;
   final ImageStreamReaderUtils imageStreamReaderUtils = new ImageStreamReaderUtils();
+  private final Handler mainHandler = new Handler(Looper.getMainLooper());
   private volatile Image lastImage = null;
 
   /** {@link CaptureRequest.Builder} for the camera preview */
@@ -423,11 +423,11 @@ class Camera
                         imageStreamReaderUtils
                 );
                     Map<String, Object> bufferCopy = imageBuffer;
-                    backgroundHandler.post(() -> {
                         if (frameStreamSink != null) {
+                         mainHandler.post(() -> {
                             frameStreamSink.success(bufferCopy);
+                          });
                         }
-                    });
                 }else {
             synchronized (this) {
                 if (lastImage != image) {
@@ -440,7 +440,9 @@ class Camera
             } 
     } catch (Exception e) {
         if (isStreamingFrames) {
-            frameStreamSink.error("Exception", "Caught Exception: " + e.getMessage(), null);
+               mainHandler.post(() -> {
+                  frameStreamSink.error("Exception", "Caught Exception: " + e.getMessage(), null);
+              });
         }
         Log.e(TAG, "Frame error", e);
     }
@@ -761,13 +763,109 @@ class Camera
       }
   }
 
-  private void saveJpegFromNV21(byte[] nv21Bytes, int width, int height, String outputPath) throws IOException {
-      YuvImage yuvImage = new YuvImage(nv21Bytes, ImageFormat.NV21, width, height, null);
-      try (FileOutputStream fos = new FileOutputStream(outputPath)) {
-          Rect rect = new Rect(0, 0, width, height);
-          yuvImage.compressToJpeg(rect, 90, fos);
-      }
-  }
+ private void saveJpegFromNV21(byte[] nv21Bytes, int width, int height, String outputPath, int rotationDegrees) throws IOException {
+    YuvImage yuvImage = new YuvImage(nv21Bytes, ImageFormat.NV21, width, height, null);
+    try (ByteArrayOutputStream jpegOut = new ByteArrayOutputStream()) {
+        Rect rect = new Rect(0, 0, width, height);
+        yuvImage.compressToJpeg(rect, 90, jpegOut);
+        byte[] jpegData = jpegOut.toByteArray();
+
+        Bitmap bitmap = BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length);
+        if (rotationDegrees != 0) {
+          Matrix matrix = new Matrix();
+          matrix.postRotate(rotationDegrees);
+
+          Bitmap rotated = Bitmap.createBitmap(
+              bitmap,
+              0,
+              0,
+              bitmap.getWidth(),
+              bitmap.getHeight(),
+              matrix,
+              true
+          );
+
+          if (rotated != bitmap) {
+              bitmap.recycle();
+          }
+
+          bitmap = rotated;
+        }
+        try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+        }
+    }
+}
+
+public byte[] convertYUV420ToNV21FromMap(Map<String, Object> imageData) {
+    int width = ((Number) imageData.get("width")).intValue();
+    int height = ((Number) imageData.get("height")).intValue();
+
+
+    @SuppressWarnings("unchecked")
+    List<Map<String, Object>> planes = (List<Map<String, Object>>) imageData.get("planes");
+
+    if (planes.size() != 2 && planes.size() != 3) {
+        throw new IllegalArgumentException("Invalid YUV420 plane count: " + planes.size());
+    }
+
+    // --- Y Plane ---
+    byte[] yPlane = (byte[]) planes.get(0).get("bytes");
+    int yRowStride = ((Number) planes.get(0).get("bytesPerRow")).intValue();
+
+    // --- U/V Planes ---
+    byte[] uPlane = (byte[]) planes.get(1).get("bytes");
+    int uRowStride = ((Number) planes.get(1).get("bytesPerRow")).intValue();
+    int uPixelStride = ((Number) planes.get(1).get("bytesPerPixel")).intValue();
+
+    byte[] vPlane;
+    int vRowStride = 0;
+    int vPixelStride = 0;
+
+    if (planes.size() == 3) {
+        vPlane = (byte[]) planes.get(2).get("bytes");
+        vRowStride = ((Number) planes.get(2).get("bytesPerRow")).intValue();
+        vPixelStride = ((Number) planes.get(2).get("bytesPerPixel")).intValue();
+    } else {
+        // Bi-planar case (e.g. NV12-style), assume UV interleaved in U
+        vPlane = null;
+    }
+
+    int ySize = width * height;
+    int uvSize = ySize / 2;
+    byte[] nv21 = new byte[ySize + uvSize];
+
+    // --- Copy Y ---
+    for (int row = 0; row < height; row++) {
+        System.arraycopy(yPlane, row * yRowStride, nv21, row * width, width);
+    }
+
+    // --- Copy interleaved VU ---
+    int uvHeight = height / 2;
+    int uvWidth = width / 2;
+
+    int dstPos = ySize;
+
+    for (int row = 0; row < uvHeight; row++) {
+        for (int col = 0; col < uvWidth; col++) {
+            int uIndex = row * uRowStride + col * uPixelStride;
+            int vIndex;
+
+            if (planes.size() == 3) {
+                vIndex = row * vRowStride + col * vPixelStride;
+                nv21[dstPos++] = vPlane[vIndex]; // V first
+                nv21[dstPos++] = uPlane[uIndex]; // then U
+            } else {
+                // NV12 case: UV interleaved in uPlane as U V U V...
+                nv21[dstPos++] = uPlane[uIndex + 1]; // V
+                nv21[dstPos++] = uPlane[uIndex];     // U
+            }
+        }
+    }
+
+    return nv21;
+}
+
 
 
 
@@ -809,12 +907,32 @@ public void capturePreviewFrameJpeg(@NonNull String outputPath, @NonNull Message
 
     backgroundHandler.post(() -> {
         try {
-            saveJpegFromNV21(nv21Bytes, width, height, outputPath);
+            saveJpegFromNV21(nv21Bytes, width, height, outputPath,0);
             result.success(outputPath);
         } catch (IOException e) {
             result.error(new Messages.FlutterError("save_failed", e.getMessage(), null));
         }
     });
+}
+
+public void saveAsJpeg(Map<String, Object> imageData, String outputPath, int rotationDegrees, Messages.Result<String> result) {
+    try {
+        int width = ((Number) imageData.get("width")).intValue();
+        int height = ((Number) imageData.get("height")).intValue();
+
+        byte[] nv21Bytes = convertYUV420ToNV21FromMap(imageData);
+
+        saveJpegFromNV21(nv21Bytes, width, height, outputPath, rotationDegrees);
+
+        mainHandler.post(() -> {
+          result.success(outputPath);
+        });
+    } catch (Exception e) {
+        e.printStackTrace();
+        mainHandler.post(() -> {
+        result.error(new Messages.FlutterError("save_failed", e.getMessage(), null));
+    });
+    }
 }
 
 

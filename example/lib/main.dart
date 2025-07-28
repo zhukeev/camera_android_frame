@@ -171,6 +171,10 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
   Widget _cameraPreviewWidget() {
     final CameraController? cameraController = controller;
 
+    if (imageFile != null) {
+      return Image.file(File(imageFile!.path));
+    }
+
     if (cameraController == null || !cameraController.value.isInitialized) {
       return const Text(
         'Tap a camera',
@@ -649,7 +653,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
           videoController = null;
         });
         if (file != null) {
-          showInSnackBar('Picture saved to ${file.path}');
+          // showInSnackBar('Picture saved to ${file.path}');
         }
       }
     });
@@ -963,7 +967,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
       final XFile file = await cameraController.takePicture();
       final sw = Stopwatch()..start();
       final frame = await cameraController.capturePreviewFrame();
-      print('first frame took ${sw.elapsedMilliseconds} ms ${frame.width}x${frame.height} ${frame.planes.first.bytes}');
+
+      await cameraController.saveAsJpeg(frame, file.path, 180);
+      print('first frame took ${sw.elapsedMilliseconds} ms ${frame.width}x${frame.height}');
 
       DateTime lastTime = DateTime.now();
 
@@ -977,7 +983,6 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
         lastTime = DateTime.now();
       });
       print('frame took ${sw.elapsedMilliseconds} ms');
-      // print(bytes);
       return file;
     } on CameraException catch (e) {
       _showCameraException(e);

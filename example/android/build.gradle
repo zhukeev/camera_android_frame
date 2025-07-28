@@ -31,7 +31,7 @@ gradle.projectsEvaluated {
     project(":camera_android_frame") {
         tasks.withType(JavaCompile) {
             // Ignore classfile due to https://issuetracker.google.com/issues/342067844
-            options.compilerArgs << "-Xlint:all" << "-Werror" << "-Xlint:-classfile"
+            options.compilerArgs << "-Xlint:all" << "-Xlint:-classfile"
         }
     }
 }

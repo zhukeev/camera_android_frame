@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:camera_android_frame/camera_android_frame.dart';
 import 'package:camera_platform_interface_frame/camera_platform_interface_frame.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -283,6 +284,10 @@ class CameraController extends ValueNotifier<CameraValue> {
   /// Captures an image and returns the bytes of the image.
   Future<CameraImageData> capturePreviewFrame() async {
     return CameraPlatform.instance.capturePreviewFrame();
+  }
+
+  Future<XFile> saveAsJpeg(CameraImageData imageData, String outputPath, int rotation) async {
+    return (CameraPlatform.instance as AndroidCamera).saveAsJpeg(imageData, outputPath, rotation);
   }
 
   Future<void> startFrameStream(void Function(CameraImageData image) onAvailable) {

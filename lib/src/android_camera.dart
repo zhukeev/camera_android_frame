@@ -189,6 +189,14 @@ class AndroidCamera extends CameraPlatform {
     final imageData = await _hostApi.capturePreviewFrame();
     return cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>);
   }
+
+  @override
+  Future<XFile> saveAsJpeg(CameraImageData imageData, String outputPath, int rotation) async {
+    final filePath =
+        await _hostApi.saveAsJpeg(imageDataToPlatformData(imageData).cast<String, Object>(), outputPath, rotation);
+    return XFile(filePath);
+  }
+
   @override
   Future<XFile> capturePreviewFrameJpeg(String outputPath) async {
     final path = await _hostApi.capturePreviewFrameJpeg(outputPath);

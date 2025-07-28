@@ -1,3 +1,10 @@
+## 0.10.14
+
+- Implemented `saveAsJpeg(Map<String, Object> imageData, String outputPath, int rotationDegrees, Result<String> result)` method:
+  - Converts YUV420 image (received as Dart map) to NV21 format.
+  - Encodes the result into a JPEG image with optional rotation.
+  - Saves the JPEG to the specified file path.
+
 ## 0.10.13
 
 - Added `capturePreviewFrameJpeg(String path)` method to capture a single JPEG preview frame.
