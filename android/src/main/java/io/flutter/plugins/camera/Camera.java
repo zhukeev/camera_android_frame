@@ -397,7 +397,7 @@ class Camera
         Image image;
 
     try {
-         image = reader.acquireNextImage();
+         image = reader.acquireLatestImage();
         if (image == null) {
             return;
         }
@@ -742,19 +742,19 @@ class Camera
   @Nullable
   private Image acquireLatestImageBlocking(Messages.Result<?> result) {
       synchronized (this) {
-          long startTime = System.currentTimeMillis();
-          while (lastImage == null && System.currentTimeMillis() - startTime < 500) {
-              try {
-                  this.wait(50);
-              } catch (InterruptedException e) {
-                  result.error(new Messages.FlutterError("interrupted", e.getMessage(), null));
-                  return null;
-              }
+          long startTime = SystemClock.elapsedRealtime();
+          while (lastImage == null && SystemClock.elapsedRealtime() - startTime < 1000) {
+            try {
+              this.wait(20);
+            } catch (InterruptedException e) {
+              result.error(new Messages.FlutterError("interrupted", e.getMessage(), null));
+              return null;
+            }
           }
 
           if (lastImage == null) {
-              result.error(new Messages.FlutterError("noImage", "No image available", null));
-              return null;
+            result.error(new Messages.FlutterError("timeout", "No image available", null));
+            return null;
           }
 
           Image imageToSave = lastImage;
