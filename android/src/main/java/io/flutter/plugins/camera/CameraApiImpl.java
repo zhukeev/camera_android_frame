@@ -187,8 +187,8 @@ final class CameraApiImpl implements Messages.CameraApi {
     camera.capturePreviewFrameJpeg(outputPath,result);
   }
   @Override
-  public void saveAsJpeg(@NonNull Map<String, Object> imageData, @NonNull String outputPath, @NonNull Long rotation, @NonNull Messages.Result<String> result){
-    camera.saveAsJpeg(imageData,outputPath,rotation.intValue(),result);
+  public void saveAsJpeg(@NonNull Map<String, Object> imageData, @NonNull String outputPath, @NonNull Long rotation,@NonNull Long quality, @NonNull Messages.Result<String> result){
+    camera.saveAsJpeg(imageData,outputPath,rotation.intValue(), quality.intValue(),result);
   }
   @Override
   public void startListenFrames() {

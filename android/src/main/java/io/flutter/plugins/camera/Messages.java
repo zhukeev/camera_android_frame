@@ -945,7 +945,7 @@ public class Messages {
     /** Capture a preview frame and return it as a jpeg */
     void capturePreviewFrameJpeg(@NonNull String outputPath, @NonNull Result<String> result);
     /** Save a preview frame to the given path. */
-    void saveAsJpeg(@NonNull Map<String, Object> imageData, @NonNull String outputPath, @NonNull Long rotation, @NonNull Result<String> result);
+    void saveAsJpeg(@NonNull Map<String, Object> imageData, @NonNull String outputPath, @NonNull Long rotation, @NonNull Long quality, @NonNull Result<String> result);
     /** Start listening for preview frames */
     void startListenFrames();
     /** Stop listening for preview frames */
@@ -1261,6 +1261,7 @@ public class Messages {
                 Map<String, Object> imageDataArg = (Map<String, Object>) args.get(0);
                 String outputPathArg = (String) args.get(1);
                 Long rotationArg = (Long) args.get(2);
+                Long qualityArg = (Long) args.get(3);
                 Result<String> resultCallback =
                     new Result<String>() {
                       public void success(String result) {
@@ -1274,7 +1275,7 @@ public class Messages {
                       }
                     };
 
-                api.saveAsJpeg(imageDataArg, outputPathArg, rotationArg, resultCallback);
+                api.saveAsJpeg(imageDataArg, outputPathArg, rotationArg, qualityArg, resultCallback);
               });
         } else {
           channel.setMessageHandler(null);

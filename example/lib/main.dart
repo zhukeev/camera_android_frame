@@ -12,9 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:video_player/video_player.dart';
 
-import 'camera_controller.dart';
-import 'camera_preview.dart';
-
 /// Camera example home widget.
 class CameraExampleHome extends StatefulWidget {
   /// Default Constructor
@@ -968,7 +965,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome> with WidgetsBindi
       final sw = Stopwatch()..start();
       final frame = await cameraController.capturePreviewFrame();
 
-      await cameraController.saveAsJpeg(frame, file.path, 180);
+      await cameraController.saveAsJpeg(frame, file.path, 180, 10);
       print('first frame took ${sw.elapsedMilliseconds} ms ${frame.width}x${frame.height}');
 
       DateTime lastTime = DateTime.now();

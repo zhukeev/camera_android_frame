@@ -152,7 +152,7 @@ abstract class CameraApi {
 
   /// Save a preview frame to the given path.
   @async
-  String saveAsJpeg(Map<String, Object> imageData, String outputPath, int rotation);
+  String saveAsJpeg(Map<String, Object> imageData, String outputPath, int rotation, int quality);
 
   /// Start listening for preview frames
   void startListenFrames();

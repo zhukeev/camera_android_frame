@@ -1,3 +1,7 @@
+## 0.10.16
+
+- updated camera_platform_interface_frame to 2.10.7
+
 ## 0.10.15
 
 - updated camera_platform_interface_frame

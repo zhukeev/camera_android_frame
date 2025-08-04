@@ -763,11 +763,11 @@ class Camera
       }
   }
 
- private void saveJpegFromNV21(byte[] nv21Bytes, int width, int height, String outputPath, int rotationDegrees) throws IOException {
+ private void saveJpegFromNV21(byte[] nv21Bytes, int width, int height, String outputPath, int rotationDegrees, int quality) throws IOException {
     YuvImage yuvImage = new YuvImage(nv21Bytes, ImageFormat.NV21, width, height, null);
     try (ByteArrayOutputStream jpegOut = new ByteArrayOutputStream()) {
         Rect rect = new Rect(0, 0, width, height);
-        yuvImage.compressToJpeg(rect, 90, jpegOut);
+        yuvImage.compressToJpeg(rect, quality, jpegOut);
         byte[] jpegData = jpegOut.toByteArray();
 
         Bitmap bitmap = BitmapFactory.decodeByteArray(jpegData, 0, jpegData.length);
@@ -907,7 +907,7 @@ public void capturePreviewFrameJpeg(@NonNull String outputPath, @NonNull Message
 
     backgroundHandler.post(() -> {
         try {
-            saveJpegFromNV21(nv21Bytes, width, height, outputPath,0);
+            saveJpegFromNV21(nv21Bytes, width, height, outputPath,0, 90 );
             result.success(outputPath);
         } catch (IOException e) {
             result.error(new Messages.FlutterError("save_failed", e.getMessage(), null));
@@ -915,14 +915,14 @@ public void capturePreviewFrameJpeg(@NonNull String outputPath, @NonNull Message
     });
 }
 
-public void saveAsJpeg(Map<String, Object> imageData, String outputPath, int rotationDegrees, Messages.Result<String> result) {
+public void saveAsJpeg(Map<String, Object> imageData, String outputPath, int rotationDegrees,int quality, Messages.Result<String> result) {
     try {
         int width = ((Number) imageData.get("width")).intValue();
         int height = ((Number) imageData.get("height")).intValue();
 
         byte[] nv21Bytes = convertYUV420ToNV21FromMap(imageData);
 
-        saveJpegFromNV21(nv21Bytes, width, height, outputPath, rotationDegrees);
+        saveJpegFromNV21(nv21Bytes, width, height, outputPath, rotationDegrees,quality);
 
         mainHandler.post(() -> {
           result.success(outputPath);
