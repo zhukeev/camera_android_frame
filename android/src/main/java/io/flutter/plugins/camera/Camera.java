@@ -391,61 +391,60 @@ class Camera
             resolutionFeature.getPreviewSize().getWidth(),
             resolutionFeature.getPreviewSize().getHeight(),
           ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
-            2);
+            4);
 
-    frameStreamReader.setOnImageAvailableListener(reader -> {
-        Image image;
+   frameStreamReader.setOnImageAvailableListener(reader -> {
+      Image image = null;
+      try {
+          image = reader.acquireLatestImage();
+          if (image == null) return;
 
-    try {
-         image = reader.acquireLatestImage();
-        if (image == null) {
-            return;
-        }
+          if (isStreamingFrames) {
+              Map<String, Object> imageBuffer = ImageStreamReader.decodeImage(
+                  image,
+                  this.captureProps,
+                  ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
+                  imageStreamReaderUtils
+              );
 
-           synchronized (this) {
-            if (!isCapturingFrame && lastImage != null) {
-                try {
-                    lastImage.close();
-                } catch (Exception e) {
-                    Log.w(TAG, "Failed to close previous lastImage", e);
-                }
-            }
-            lastImage = image;
-            this.notifyAll();
+              if (frameStreamSink != null) {
+                  Map<String, Object> bufferCopy = imageBuffer;
+                  mainHandler.post(() -> frameStreamSink.success(bufferCopy));
+              }
+
+              image.close();
+              return;
           }
 
-            try {
-                if (isStreamingFrames) {
-                   Map<String, Object> imageBuffer = ImageStreamReader.decodeImage(
-                        image,
-                        this.captureProps,
-                        ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
-                        imageStreamReaderUtils
-                );
-                    Map<String, Object> bufferCopy = imageBuffer;
-                        if (frameStreamSink != null) {
-                         mainHandler.post(() -> {
-                            frameStreamSink.success(bufferCopy);
-                          });
-                        }
-                }else {
-            synchronized (this) {
-                if (lastImage != image) {
-                    image.close(); 
-                }
-            }
-        }
-            } catch (Exception e) {
-                Log.e(TAG, "decodeImage failed", e);
-            } 
-    } catch (Exception e) {
-        if (isStreamingFrames) {
-               mainHandler.post(() -> {
-                  frameStreamSink.error("Exception", "Caught Exception: " + e.getMessage(), null);
-              });
-        }
-        Log.e(TAG, "Frame error", e);
-    }
+          synchronized (this) {
+              if (!isCapturingFrame && lastImage != null) {
+                  try {
+                      lastImage.close();
+                  } catch (Exception e) {
+                      Log.w(TAG, "Failed to close previous lastImage", e);
+                  }
+              }
+
+              lastImage = image;
+              image = null;
+
+              this.notifyAll();
+          }
+
+      } catch (Exception e) {
+          Log.e(TAG, "Frame error", e);
+          if (isStreamingFrames && frameStreamSink != null) {
+              mainHandler.post(() -> frameStreamSink.error("Exception", "Caught Exception: " + e.getMessage(), null));
+          }
+      } finally {
+          if (image != null) {
+              try {
+                  image.close();
+              } catch (Exception closeErr) {
+                  Log.w(TAG, "Failed to close image in finally", closeErr);
+              }
+          }
+      }
   }, backgroundHandler);
 
 

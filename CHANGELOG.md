@@ -1,3 +1,7 @@
+## 0.10.17
+
+- fix: image leak
+
 ## 0.10.16
 
 - updated camera_platform_interface_frame to 2.10.7
