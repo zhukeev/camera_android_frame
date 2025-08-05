@@ -1,4 +1,4 @@
-# camera_android
+# camera_android_frame
 
 The Android implementation of the [`camera`](https://pub.dev/packages/camera) plugin.
 
