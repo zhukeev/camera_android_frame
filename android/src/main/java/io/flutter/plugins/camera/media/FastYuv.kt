@@ -5,6 +5,7 @@ import android.graphics.ImageFormat
 import android.media.Image
 import io.github.crow_misia.libyuv.I420Buffer
 import io.github.crow_misia.libyuv.Nv21Buffer
+import io.github.crow_misia.libyuv.RotateMode
 import java.nio.ByteBuffer
 import kotlin.math.min
 
@@ -45,7 +46,6 @@ fun imageToI420(image: Image): I420Buffer {
 
     val dst = I420Buffer.allocate(w, h)
 
-    // ВАЖНО: используем stride у плоскостей, а не несуществующие strideY/U/V
     copyPlane(
         src = y.buffer, srcRowStride = y.rowStride, srcPixelStride = y.pixelStride,
         dst = dst.planeY.buffer, dstRowStride = dst.planeY.rowStride.value,
@@ -122,4 +122,53 @@ private fun copyPlane(
             for (c in cols until width) d.put(dBase + c, tail)
         }
     }
+}
+
+fun imageToNv21Rotated(src: ByteArray, width: Int, height: Int, rotationDegrees: Int): Nv21Result {
+    val need = width * height * 3 / 2
+    require(src.size >= need) { "NV21 buffer too small: have=${src.size}, need=$need" }
+
+    val mode = when (((rotationDegrees % 360) + 360) % 360) {
+        90  -> RotateMode.ROTATE_90
+        180 -> RotateMode.ROTATE_180
+        270 -> RotateMode.ROTATE_270
+        else -> RotateMode.ROTATE_0
+    }
+    if (mode == RotateMode.ROTATE_0) {
+        // копия на всякий случай, чтобы вызывающий не модифицировал исходный массив
+        return Nv21Result(src.copyOf(need), width, height)
+    }
+
+    val nv21Src = Nv21Buffer.allocate(width, height).also { buf ->
+        val bb = buf.asBuffer()
+        bb.position(0)
+        bb.put(src, 0, need)
+        bb.position(0)
+    }
+
+    val i420 = I420Buffer.allocate(width, height)
+    nv21Src.convertTo(i420)
+    nv21Src.close()
+
+    val (rw, rh) = if (mode == RotateMode.ROTATE_90 || mode == RotateMode.ROTATE_270) {
+        height to width
+    } else {
+        width to height
+    }
+    val i420Rot = I420Buffer.allocate(rw, rh)
+    i420.rotate(i420Rot, mode)
+    i420.close()
+
+    val nv21Dst = Nv21Buffer.allocate(rw, rh)
+    i420Rot.convertTo(nv21Dst)
+    i420Rot.close()
+
+    val out = ByteArray(rw * rh * 3 / 2)
+    nv21Dst.asBuffer().apply {
+        position(0)
+        get(out, 0, out.size)
+    }
+    nv21Dst.close()
+
+    return Nv21Result(out, rw, rh)
 }

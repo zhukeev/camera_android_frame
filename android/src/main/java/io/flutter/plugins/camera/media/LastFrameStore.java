@@ -15,14 +15,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-/**
- * Usage:
- *   LastFrameStore store = new LastFrameStore();
- *   // in onImageAvailable:
- *   store.accept(image); // image будет закрыт внутри
- *   // когда нужно сохранить:
- *   String path = store.writeJpeg("/path/out.jpg", rotationDegrees, quality);
- */
 public final class LastFrameStore {
     private static final String TAG = "LastFrameStore";
 
@@ -94,7 +86,7 @@ public final class LastFrameStore {
                 throw new IOException("compressToJpeg failed");
             }
         }
-        setExifOrientation(outputPath, rotationDegrees);
+        FastYuv.imageToNv21Rotated(f.nv21, f.width, f.height, rotationDegrees); 
         return outputPath;
     }
 
@@ -125,12 +117,10 @@ public final class LastFrameStore {
 
         int dstY = 0;
         if (yPixStride == 1 && yRowStride == width) {
-            // Быстрый путь — сплошной копипаст
             yBuf.position(0);
             yBuf.get(out, 0, width * height);
             dstY = width * height;
         } else {
-            // Построчно, без underflow
             byte[] row = new byte[yRowStride];
             for (int r = 0; r < height; r++) {
                 int pos = r * yRowStride;
