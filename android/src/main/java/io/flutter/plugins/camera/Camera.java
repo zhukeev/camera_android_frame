@@ -53,6 +53,8 @@ import io.flutter.BuildConfig;
 import io.flutter.embedding.engine.systemchannels.PlatformChannel;
 import io.flutter.plugins.camera.media.ImageStreamReaderUtils;
 import io.flutter.plugins.camera.media.LastFrameStore;
+import io.flutter.plugins.camera.media.FastYuv;
+
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugins.camera.features.CameraFeature;
 import io.flutter.plugins.camera.features.CameraFeatureFactory;
@@ -164,18 +166,20 @@ class Camera
     ImageReader frameStreamReader;
 
     private EventChannel.EventSink frameStreamSink = null;
-    private boolean isStreamingFrames = false;
     final ImageStreamReaderUtils imageStreamReaderUtils = new ImageStreamReaderUtils();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private Map<String, Object> lastImageBuffer = null;
-    private static final long FRAME_INTERVAL_NS = 200_000_000L; // 5 fps -> 200ms
-    private final AtomicLong lastFrameTimeNs = new AtomicLong(0);
     private final LastFrameStore lastFrameStore = new LastFrameStore();
 
-    private static final int RING = 2;
-    private final byte[][] nv21Ring = new byte[RING][];
-    private int ringIdx = 0;
-    private int ringW = -1, ringH = -1;
+    private final Object jpegScratchLock = new Object();
+    @Nullable private byte[] scratchNv21;
+    @Nullable private byte[] scratchNv21Rot;
+
+    private static int nv21Size(int w, int h) { return (w * h * 3) / 2; }
+
+    private byte[] ensureNv21Scratch(@Nullable byte[] cur, int need) {
+    if (cur == null || cur.length < need) return new byte[need];
+    return cur;
+    }
 
     /**
      * {@link CaptureRequest.Builder} for the camera preview
@@ -408,14 +412,15 @@ class Camera
         }
     }
 
-    @SuppressLint({"MissingPermission", "VisibleForTests"})
+    @SuppressLint({ "MissingPermission", "VisibleForTests" })
     public void open(Integer imageFormatGroup) throws CameraAccessException {
         this.imageFormatGroup = imageFormatGroup;
         final ResolutionFeature resolutionFeature = cameraFeatures.getResolution();
 
         if (!resolutionFeature.checkIsSupported()) {
             // Tell the user that the camera they are trying to open is not supported,
-            // as its {@link android.media.CamcorderProfile} cannot be fetched due to the name
+            // as its {@link android.media.CamcorderProfile} cannot be fetched due to the
+            // name
             // not being a valid parsable integer.
             dartMessenger.sendCameraErrorEvent(
                     "Camera with name \""
@@ -425,43 +430,40 @@ class Camera
         }
 
         // Always capture using JPEG format.
-        pictureImageReader =
-                ImageReader.newInstance(
-                        resolutionFeature.getCaptureSize().getWidth(),
-                        resolutionFeature.getCaptureSize().getHeight(),
-                        ImageFormat.JPEG,
-                        1);
+        pictureImageReader = ImageReader.newInstance(
+                resolutionFeature.getCaptureSize().getWidth(),
+                resolutionFeature.getCaptureSize().getHeight(),
+                ImageFormat.JPEG,
+                1);
 
-        imageStreamReader =
-                new ImageStreamReader(
-                        resolutionFeature.getPreviewSize().getWidth(),
-                        resolutionFeature.getPreviewSize().getHeight(),
-                        this.imageFormatGroup,
-                        1);
-        frameStreamReader =
-                ImageReader.newInstance(
-                        resolutionFeature.getPreviewSize().getWidth(),
-                        resolutionFeature.getPreviewSize().getHeight(),
-                        ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
-                        4);
+        imageStreamReader = new ImageStreamReader(
+                resolutionFeature.getPreviewSize().getWidth(),
+                resolutionFeature.getPreviewSize().getHeight(),
+                this.imageFormatGroup,
+                1);
+        frameStreamReader = ImageReader.newInstance(
+                resolutionFeature.getPreviewSize().getWidth(),
+                resolutionFeature.getPreviewSize().getHeight(),
+                ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
+                4);
         frameStreamReader.setOnImageAvailableListener(reader -> {
-          Image image = null;
-          try {
-            image = reader.acquireLatestImage();
-            if (image == null)
-              return;
+            Image image = null;
+            try {
+                image = reader.acquireLatestImage();
+                if (image == null)
+                    return;
 
-            lastFrameStore.accept(image);
-            image = null;
-          } catch (Exception e) {
-            if (image != null) {
-              try {
-                image.close();
-              } catch (Exception ignore) {
-              }
+                lastFrameStore.accept(image);
+                image = null;
+            } catch (Exception e) {
+                if (image != null) {
+                    try {
+                        image.close();
+                    } catch (Exception ignore) {
+                    }
+                }
+                Log.e(TAG, "onImageAvailable", e);
             }
-            Log.e(TAG, "onImageAvailable", e);
-          }
         }, backgroundHandler);
 
 
@@ -475,23 +477,20 @@ class Camera
                         cameraDevice = new DefaultCameraDeviceWrapper(device);
                         try {
                             // only send initialization if we werent already recording and switching cameras
-                            Runnable onSuccess =
-                                    recordingVideo
-                                            ? null
-                                            : () ->
-                                            dartMessenger.sendCameraInitializedEvent(
-                                                    resolutionFeature.getPreviewSize().getWidth(),
-                                                    resolutionFeature.getPreviewSize().getHeight(),
-                                                    cameraFeatures.getExposureLock().getValue(),
-                                                    cameraFeatures.getAutoFocus().getValue(),
-                                                    cameraFeatures.getExposurePoint().checkIsSupported(),
-                                                    cameraFeatures.getFocusPoint().checkIsSupported());
+                            Runnable onSuccess = recordingVideo
+                                    ? null
+                                    : () -> dartMessenger.sendCameraInitializedEvent(
+                                            resolutionFeature.getPreviewSize().getWidth(),
+                                            resolutionFeature.getPreviewSize().getHeight(),
+                                            cameraFeatures.getExposureLock().getValue(),
+                                            cameraFeatures.getAutoFocus().getValue(),
+                                            cameraFeatures.getExposurePoint().checkIsSupported(),
+                                            cameraFeatures.getFocusPoint().checkIsSupported());
                             startPreview(onSuccess);
                         } catch (Exception e) {
-                            String message =
-                                    (e.getMessage() == null)
-                                            ? (e.getClass().getName() + " occurred while opening camera.")
-                                            : e.getMessage();
+                            String message = (e.getMessage() == null)
+                                    ? (e.getClass().getName() + " occurred while opening camera.")
+                                    : e.getMessage();
                             if (BuildConfig.DEBUG) {
                                 Log.i(TAG, "open | onOpened error: " + message);
                             }
@@ -504,7 +503,8 @@ class Camera
                     public void onClosed(@NonNull CameraDevice camera) {
                         Log.i(TAG, "open | onClosed");
 
-                        // Prevents calls to methods that would otherwise result in IllegalStateException
+                        // Prevents calls to methods that would otherwise result in
+                        // IllegalStateException
                         // exceptions.
                         cameraDevice = null;
                         closeCaptureSession();
@@ -753,180 +753,227 @@ class Camera
     }
 
     private void saveJpegFromNV21(byte[] nv21, int width, int height,
-        String outputPath, int rotationDegrees, int quality) throws IOException {
-      if (rotationDegrees == 0) {
-        YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
-        try (FileOutputStream fos = new FileOutputStream(outputPath)) {
-          Rect rect = new Rect(0, 0, width, height);
-          if (!yuv.compressToJpeg(rect, quality, fos)) {
-            throw new IOException("compressToJpeg failed");
-          }
+            String outputPath, int rotationDegrees, int quality) throws IOException {
+        if (rotationDegrees == 0) {
+            YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
+            try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+                Rect rect = new Rect(0, 0, width, height);
+                if (!yuv.compressToJpeg(rect, quality, fos)) {
+                    throw new IOException("compressToJpeg failed");
+                }
+            }
+            return;
         }
-        return;
-      }
-      saveJpegFromNV21WithRotation(nv21, width, height, outputPath, rotationDegrees, quality);
+        saveJpegFromNV21WithRotation(nv21, width, height, outputPath, rotationDegrees, quality);
     }
 
     private void saveJpegFromNV21WithRotation(byte[] nv21, int width, int height,
-        String outputPath, int rotationDegrees, int quality) throws IOException {
-      YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
-      try (FileOutputStream fos = new FileOutputStream(outputPath)) {
-        Rect rect = new Rect(0, 0, width, height);
-        if (!yuv.compressToJpeg(rect, quality, fos)) {
-          throw new IOException("compressToJpeg failed");
-        }
-      }
-
-      int exifOrientation = exifFromDegrees(rotationDegrees);
-      if (exifOrientation != ExifInterface.ORIENTATION_UNDEFINED) {
-        ExifInterface exif = new ExifInterface(outputPath);
-        exif.setAttribute(ExifInterface.TAG_ORIENTATION, String.valueOf(exifOrientation));
-        exif.saveAttributes();
-      }
-    }
-
-    private int exifFromDegrees(int degrees) {
-      switch ((degrees % 360 + 360) % 360) {
-        case 90:
-          return ExifInterface.ORIENTATION_ROTATE_90;
-        case 180:
-          return ExifInterface.ORIENTATION_ROTATE_180;
-        case 270:
-          return ExifInterface.ORIENTATION_ROTATE_270;
-        case 0:
-          return ExifInterface.ORIENTATION_NORMAL;
-        default:
-          return ExifInterface.ORIENTATION_UNDEFINED;
-      }
-    }
-
-    public byte[] convertYUV420ToNV21FromMap(Map<String, Object> imageData) {
-        int width = ((Number) imageData.get("width")).intValue();
-        int height = ((Number) imageData.get("height")).intValue();
-
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> planes = (List<Map<String, Object>>) imageData.get("planes");
-
-        if (planes.size() != 2 && planes.size() != 3) {
-            throw new IllegalArgumentException("Invalid YUV420 plane count: " + planes.size());
-        }
-
-        // --- Y Plane ---
-        byte[] yPlane = (byte[]) planes.get(0).get("bytes");
-        int yRowStride = ((Number) planes.get(0).get("bytesPerRow")).intValue();
-
-        // --- U/V Planes ---
-        byte[] uPlane = (byte[]) planes.get(1).get("bytes");
-        int uRowStride = ((Number) planes.get(1).get("bytesPerRow")).intValue();
-        int uPixelStride = ((Number) planes.get(1).get("bytesPerPixel")).intValue();
-
-        byte[] vPlane;
-        int vRowStride = 0;
-        int vPixelStride = 0;
-
-        if (planes.size() == 3) {
-            vPlane = (byte[]) planes.get(2).get("bytes");
-            vRowStride = ((Number) planes.get(2).get("bytesPerRow")).intValue();
-            vPixelStride = ((Number) planes.get(2).get("bytesPerPixel")).intValue();
-        } else {
-            // Bi-planar case (e.g. NV12-style), assume UV interleaved in U
-            vPlane = null;
-        }
-
-        int ySize = width * height;
-        int uvSize = ySize / 2;
-        byte[] nv21 = new byte[ySize + uvSize];
-
-        // --- Copy Y ---
-        for (int row = 0; row < height; row++) {
-            System.arraycopy(yPlane, row * yRowStride, nv21, row * width, width);
-        }
-
-        // --- Copy interleaved VU ---
-        int uvHeight = height / 2;
-        int uvWidth = width / 2;
-
-        int dstPos = ySize;
-
-        for (int row = 0; row < uvHeight; row++) {
-            for (int col = 0; col < uvWidth; col++) {
-                int uIndex = row * uRowStride + col * uPixelStride;
-                int vIndex;
-
-                if (planes.size() == 3) {
-                    vIndex = row * vRowStride + col * vPixelStride;
-                    nv21[dstPos++] = vPlane[vIndex]; // V first
-                    nv21[dstPos++] = uPlane[uIndex]; // then U
-                } else {
-                    // NV12 case: UV interleaved in uPlane as U V U V...
-                    nv21[dstPos++] = uPlane[uIndex + 1]; // V
-                    nv21[dstPos++] = uPlane[uIndex]; // U
-                }
+            String outputPath, int rotationDegrees, int quality) throws IOException {
+        YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
+        try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+            Rect rect = new Rect(0, 0, width, height);
+            if (!yuv.compressToJpeg(rect, quality, fos)) {
+                throw new IOException("compressToJpeg failed");
             }
         }
 
-        return nv21;
     }
 
+    @SuppressWarnings("unchecked")
+    private byte[] convertYUV420ToNV21FromMap(Map<String, Object> imageData) {
+    final int width  = ((Number) imageData.get("width")).intValue();
+    final int height = ((Number) imageData.get("height")).intValue();
+    final int need   = nv21Size(width, height);
+
+    final List<Map<String, Object>> planes = (List<Map<String, Object>>) imageData.get("planes");
+
+    // If NV21 already arrived as a single plane, just copy into our reusable buffer
+    if (planes.size() == 1) {
+        byte[] src = (byte[]) planes.get(0).get("bytes");
+        synchronized (jpegScratchLock) {
+        scratchNv21 = ensureNv21Scratch(scratchNv21, need);
+        System.arraycopy(src, 0, scratchNv21, 0, Math.min(src.length, need));
+        return scratchNv21;
+        }
+    }
+
+    if (planes.size() != 3 && planes.size() != 2) {
+        throw new IllegalArgumentException("Invalid YUV420 plane count: " + planes.size());
+    }
+
+    // --- Y plane ---
+    final byte[] yPlane     = (byte[]) planes.get(0).get("bytes");
+    final int    yRowStride = ((Number) planes.get(0).get("bytesPerRow")).intValue();
+
+    // --- U/V planes ---
+    final byte[] uPlane       = (byte[]) planes.get(1).get("bytes");
+    final int    uRowStride   = ((Number) planes.get(1).get("bytesPerRow")).intValue();
+    final int    uPixelStride = ((Number) planes.get(1).get("bytesPerPixel")).intValue();
+
+    final byte[] vPlane;
+    final int    vRowStride;
+    final int    vPixelStride;
+
+    final boolean threePlanes = planes.size() == 3;
+    if (threePlanes) {
+        vPlane       = (byte[]) planes.get(2).get("bytes");
+        vRowStride   = ((Number) planes.get(2).get("bytesPerRow")).intValue();
+        vPixelStride = ((Number) planes.get(2).get("bytesPerPixel")).intValue();
+    } else {
+        // Bi-planar case (NV12-like): UV interleaved inside U plane
+        vPlane = null; vRowStride = 0; vPixelStride = 0;
+    }
+
+    synchronized (jpegScratchLock) {
+        scratchNv21 = ensureNv21Scratch(scratchNv21, need);
+        final byte[] dst = scratchNv21;
+
+        // Copy Y (assumes the Y plane buffer is tightly packed by rowStride across height rows)
+        for (int row = 0; row < height; row++) {
+        System.arraycopy(yPlane, row * yRowStride, dst, row * width, width);
+        }
+
+        // Copy interleaved VU (NV21 layout)
+        final int uvHeight = height / 2;
+        final int uvWidth  = width  / 2;
+        int d = width * height; // start of UV area in NV21
+
+        for (int row = 0; row < uvHeight; row++) {
+        final int urow = row * uRowStride;
+        final int vrow = row * vRowStride;
+        for (int col = 0; col < uvWidth; col++) {
+            final int uIndex = urow + col * uPixelStride;
+            if (threePlanes) {
+            final int vIndex = vrow + col * vPixelStride;
+            dst[d++] = vPlane[vIndex]; // V
+            dst[d++] = uPlane[uIndex]; // U
+            } else {
+            // NV12 case: U,V,U,V,... inside uPlane
+            dst[d++] = uPlane[uIndex + 1]; // V
+            dst[d++] = uPlane[uIndex];     // U
+            }
+        }
+        }
+        return dst;
+    }
+    }
+
+
     public void capturePreviewFrame(@NonNull Messages.Result<Map<String, Object>> result) {
-        result.success(lastImageBuffer);
+        Map<String, Object> map = lastFrameStore.getPreviewFrameMap(this.captureProps, true);
+        if (map == null) {
+            result.error(new Messages.FlutterError("no_frame", "No frame available", null));
+        } else {
+            result.success(map);
+        }
     }
 
     public void capturePreviewFrameJpeg(@NonNull String outputPath, int rotationDegrees, int quality,
-        @NonNull Messages.Result<String> result) {
-      backgroundHandler.post(() -> {
-        try {
-          if (!lastFrameStore.hasFrame()) {
-            mainHandler.post(() -> result.error(new Messages.FlutterError("no_frame", "No frame available", null)));
-            return;
-          }
-          lastFrameStore.writeJpeg(outputPath, rotationDegrees, quality);
-          mainHandler.post(() -> result.success(outputPath));
-        } catch (IOException e) {
-          mainHandler.post(() -> result.error(new Messages.FlutterError("save_failed", e.getMessage(), null)));
-        }
-      });
-    }
-
-    public void saveAsJpeg(Map<String, Object> imageData, String outputPath, int rotationDegrees, int quality,
-                           Messages.Result<String> result) {
-        try {
-            int width = ((Number) imageData.get("width")).intValue();
-            int height = ((Number) imageData.get("height")).intValue();
-
-            byte[] nv21Bytes = convertYUV420ToNV21FromMap(imageData);
-
-            saveJpegFromNV21(nv21Bytes, width, height, outputPath, rotationDegrees, quality);
-
-            mainHandler.post(() -> {
-                result.success(outputPath);
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-            mainHandler.post(() -> {
-                result.error(new Messages.FlutterError("save_failed", e.getMessage(), null));
-            });
-        }
-    }
-
-    public void startListenFrames(@NonNull EventChannel frameStreamChannel) {
-        frameStreamChannel.setStreamHandler(new EventChannel.StreamHandler() {
-            @Override
-            public void onListen(Object arguments, EventChannel.EventSink events) {
-                isStreamingFrames = true;
-                frameStreamSink = events;
-            }
-
-            @Override
-            public void onCancel(Object arguments) {
-                isStreamingFrames = false;
-                frameStreamSink = null;
+            @NonNull Messages.Result<String> result) {
+        backgroundHandler.post(() -> {
+            try {
+                if (!lastFrameStore.hasFrame()) {
+                    mainHandler.post(
+                            () -> result.error(new Messages.FlutterError("no_frame", "No frame available", null)));
+                    return;
+                }
+                lastFrameStore.writeJpeg(outputPath, rotationDegrees, quality);
+                mainHandler.post(() -> result.success(outputPath));
+            } catch (IOException e) {
+                mainHandler.post(() -> result.error(new Messages.FlutterError("save_failed", e.getMessage(), null)));
             }
         });
     }
 
+    public void saveAsJpeg(
+        Map<String, Object> imageData,
+        String outputPath,
+        int rotationDegrees,
+        int quality,
+        Messages.Result<String> result
+    ) {
+    backgroundHandler.post(() -> {
+        try {
+        final int width  = ((Number) imageData.get("width")).intValue();
+        final int height = ((Number) imageData.get("height")).intValue();
+
+        final byte[] srcNv21 = convertYUV420ToNV21FromMap(imageData);
+
+        // No rotation → compress straight to JPEG
+        if ((rotationDegrees % 360) == 0) {
+            writeJpegFromNv21(srcNv21, width, height, outputPath, quality);
+            mainHandler.post(() -> result.success(outputPath));
+            return;
+        }
+
+        // For safety, skip rotation for odd dimensions (YUV420 is 2x2 chroma)
+        if (((width | height) & 1) != 0) {
+            writeJpegFromNv21(srcNv21, width, height, outputPath, quality);
+            mainHandler.post(() -> result.success(outputPath));
+            return;
+        }
+
+        final boolean swap = (rotationDegrees % 180 != 0);
+        final int outW = swap ? height : width;
+        final int outH = swap ? width  : height;
+        final int outSize = nv21Size(outW, outH);
+
+        synchronized (jpegScratchLock) {
+            scratchNv21Rot = ensureNv21Scratch(scratchNv21Rot, outSize);
+            // Uses FastYuv to rotate NV21 into the provided destination buffer
+            FastYuv.rotateNv21Into(srcNv21, width, height, rotationDegrees, scratchNv21Rot);
+            writeJpegFromNv21(scratchNv21Rot, outW, outH, outputPath, quality);
+        }
+
+        mainHandler.post(() -> result.success(outputPath));
+        } catch (Throwable e) {
+        e.printStackTrace();
+        mainHandler.post(() -> result.error(new Messages.FlutterError(
+            "save_failed", e.getMessage() != null ? e.getMessage() : "error", null)));
+        }
+    });
+    }
+
+
+
+    private void writeJpegFromNv21(byte[] nv21, int width, int height, String outputPath, int quality)
+        throws IOException {
+    // Clamp quality to [1..100] for safety.
+    final int q = Math.max(1, Math.min(100, quality));
+    YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
+        try (FileOutputStream fos = new FileOutputStream(outputPath)) {
+            android.graphics.Rect rect = new android.graphics.Rect(0, 0, width, height);
+            if (!yuv.compressToJpeg(rect, q, fos)) {
+            throw new IOException("compressToJpeg failed");
+            }
+        }
+    }
+
+    // Starts listening: store sink and send the latest frame once, keep stream open.
+    public void startListenFrames(@NonNull EventChannel frameStreamChannel) {
+
+    lastFrameStore.setOnFrameListener(frameMap -> {
+        final EventChannel.EventSink sink = frameStreamSink;
+        if (sink == null) return;
+        // deliver on main thread
+        mainHandler.post(() -> sink.success(frameMap));
+    }, /*copyBytesForCallback=*/true);
+
+    frameStreamChannel.setStreamHandler(new EventChannel.StreamHandler() {
+        @Override
+        public void onListen(Object arguments, EventChannel.EventSink events) {
+        frameStreamSink = events;
+        }
+
+        @Override
+        public void onCancel(Object arguments) {
+        frameStreamSink = null;
+        }
+        });
+    }
+
     public void stopListenFrames() {
-        isStreamingFrames = false;
+        lastFrameStore.clearOnFrameListener();
         frameStreamSink = null;
     }
 
@@ -1505,7 +1552,8 @@ class Camera
         // get rotation for rendered video
         final PlatformChannel.DeviceOrientation lockedOrientation = cameraFeatures.getSensorOrientation()
                 .getLockedCaptureOrientation();
-        DeviceOrientationManager orientationManager = cameraFeatures.getSensorOrientation().getDeviceOrientationManager();
+        DeviceOrientationManager orientationManager = cameraFeatures.getSensorOrientation()
+                .getDeviceOrientationManager();
 
         int rotation = 0;
         if (orientationManager != null) {
