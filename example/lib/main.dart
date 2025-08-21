@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:camera_android_frame/camera_android_frame.dart';
 import 'package:camera_platform_interface_frame/camera_platform_interface_frame.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

@@ -1819,11 +1819,4 @@ class Camera
             return new Handler(looper);
         }
     }
-
-    private enum FrameCaptureMode {
-        NONE,
-        STREAM,
-        SINGLE
-    }
-
 }
