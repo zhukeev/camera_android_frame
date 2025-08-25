@@ -943,7 +943,7 @@ public class Messages {
     /** Capture a preview frame and return it as a map */
     void capturePreviewFrame(@NonNull Result<Map<String, Object>> result);
     /** Capture a preview frame and return it as a jpeg */
-    void capturePreviewFrameJpeg(@NonNull String outputPath, @NonNull Result<String> result);
+    void capturePreviewFrameJpeg(@NonNull String outputPath, @NonNull Long rotation, @NonNull Long quality, @NonNull Result<String> result);
     /** Save a preview frame to the given path. */
     void saveAsJpeg(@NonNull Map<String, Object> imageData, @NonNull String outputPath, @NonNull Long rotation, @NonNull Long quality, @NonNull Result<String> result);
     /** Start listening for preview frames */
@@ -1230,6 +1230,8 @@ public class Messages {
                 ArrayList<Object> wrapped = new ArrayList<>();
                 ArrayList<Object> args = (ArrayList<Object>) message;
                 String outputPathArg = (String) args.get(0);
+                Long rotationArg = (Long) args.get(1);
+                Long qualityArg = (Long) args.get(2);
                 Result<String> resultCallback =
                     new Result<String>() {
                       public void success(String result) {
@@ -1243,7 +1245,7 @@ public class Messages {
                       }
                     };
 
-                api.capturePreviewFrameJpeg(outputPathArg, resultCallback);
+                api.capturePreviewFrameJpeg(outputPathArg, rotationArg, qualityArg, resultCallback);
               });
         } else {
           channel.setMessageHandler(null);

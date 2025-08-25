@@ -1,3 +1,7 @@
+## 0.10.18
+
+- `capturePreviewFrameJpeg` added paraeters `quality`, `rotation`
+
 ## 0.10.17
 
 - fix: image leak

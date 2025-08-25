@@ -148,7 +148,7 @@ abstract class CameraApi {
 
   /// Capture a preview frame and return it as a jpeg
   @async
-  String capturePreviewFrameJpeg(String outputPath);
+  String capturePreviewFrameJpeg(String outputPath, int rotation, int quality);
 
   /// Save a preview frame to the given path.
   @async
