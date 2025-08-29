@@ -3,23 +3,24 @@
 // found in the LICENSE file.
 import 'package:pigeon/pigeon.dart';
 
-@ConfigurePigeon(PigeonOptions(
-  dartOut: 'lib/src/messages.g.dart',
-  javaOptions: JavaOptions(package: 'io.flutter.plugins.camera'),
-  javaOut: 'android/src/main/java/io/flutter/plugins/camera/Messages.java',
-  copyrightHeader: 'pigeons/copyright.txt',
-))
-
+@ConfigurePigeon(
+  PigeonOptions(
+    dartOut: 'lib/src/messages.g.dart',
+    javaOptions: JavaOptions(package: 'io.flutter.plugins.camera'),
+    javaOut: 'android/src/main/java/io/flutter/plugins/camera/Messages.java',
+    copyrightHeader: 'pigeons/copyright.txt',
+  ),
+)
 /// Pigeon equivalent of [CameraLensDirection].
-enum PlatformCameraLensDirection {
-  front,
-  back,
-  external,
-}
+enum PlatformCameraLensDirection { front, back, external }
 
 /// Pigeon equivalent of [CameraDescription].
 class PlatformCameraDescription {
-  PlatformCameraDescription({required this.name, required this.lensDirection, required this.sensorOrientation});
+  PlatformCameraDescription({
+    required this.name,
+    required this.lensDirection,
+    required this.sensorOrientation,
+  });
 
   final String name;
   final PlatformCameraLensDirection lensDirection;
@@ -35,25 +36,20 @@ enum PlatformDeviceOrientation {
 }
 
 /// Pigeon equivalent of [ExposureMode].
-enum PlatformExposureMode {
-  auto,
-  locked,
-}
+enum PlatformExposureMode { auto, locked }
 
 /// Pigeon equivalent of [FocusMode].
-enum PlatformFocusMode {
-  auto,
-  locked,
-}
+enum PlatformFocusMode { auto, locked }
 
 /// Data needed for [CameraInitializedEvent].
 class PlatformCameraState {
-  PlatformCameraState(
-      {required this.previewSize,
-      required this.exposureMode,
-      required this.focusMode,
-      required this.exposurePointSupported,
-      required this.focusPointSupported});
+  PlatformCameraState({
+    required this.previewSize,
+    required this.exposureMode,
+    required this.focusMode,
+    required this.exposurePointSupported,
+    required this.focusPointSupported,
+  });
 
   final PlatformSize previewSize;
   final PlatformExposureMode exposureMode;
@@ -79,19 +75,17 @@ class PlatformPoint {
 }
 
 /// Pigeon equivalent of [ResolutionPreset].
-enum PlatformResolutionPreset {
-  low,
-  medium,
-  high,
-  veryHigh,
-  ultraHigh,
-  max,
-}
+enum PlatformResolutionPreset { low, medium, high, veryHigh, ultraHigh, max }
 
 /// Pigeon equivalent of [MediaSettings].
 class PlatformMediaSettings {
-  PlatformMediaSettings(
-      {required this.resolutionPreset, required this.enableAudio, this.fps, this.videoBitrate, this.audioBitrate});
+  PlatformMediaSettings({
+    required this.resolutionPreset,
+    required this.enableAudio,
+    this.fps,
+    this.videoBitrate,
+    this.audioBitrate,
+  });
   final PlatformResolutionPreset resolutionPreset;
   final int? fps;
   final int? videoBitrate;
@@ -108,12 +102,7 @@ enum PlatformImageFormatGroup {
 }
 
 /// Pigeon equivalent of [FlashMode].
-enum PlatformFlashMode {
-  off,
-  auto,
-  always,
-  torch,
-}
+enum PlatformFlashMode { off, auto, always, torch }
 
 /// Handles calls from Dart to the native side.
 @HostApi()
@@ -141,24 +130,6 @@ abstract class CameraApi {
   /// resulting file.
   @async
   String takePicture();
-
-  /// Capture a preview frame and return it as a map
-  @async
-  Map<String, Object> capturePreviewFrame();
-
-  /// Capture a preview frame and return it as a jpeg
-  @async
-  String capturePreviewFrameJpeg(String outputPath, int rotation, int quality);
-
-  /// Save a preview frame to the given path.
-  @async
-  String saveAsJpeg(Map<String, Object> imageData, String outputPath, int rotation, int quality);
-
-  /// Start listening for preview frames
-  void startListenFrames();
-
-  /// Stop listening for preview frames
-  void stopListenFrames();
 
   /// Starts recording a video on the camera with the given ID.
   void startVideoRecording(bool enableStream);

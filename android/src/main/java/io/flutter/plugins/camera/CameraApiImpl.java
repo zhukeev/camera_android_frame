@@ -22,7 +22,6 @@ import io.flutter.plugins.camera.features.resolution.ResolutionPreset;
 import io.flutter.view.TextureRegistry;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 final class CameraApiImpl implements Messages.CameraApi {
   private final Activity activity;
@@ -31,7 +30,6 @@ final class CameraApiImpl implements Messages.CameraApi {
   private final PermissionsRegistry permissionsRegistry;
   private final TextureRegistry textureRegistry;
   private final EventChannel imageStreamChannel;
-  private final EventChannel framesStreamChannel;
   @VisibleForTesting @Nullable Camera camera;
 
   CameraApiImpl(
@@ -48,8 +46,6 @@ final class CameraApiImpl implements Messages.CameraApi {
 
     imageStreamChannel =
         new EventChannel(messenger, "plugins.flutter.io/camera_android/imageStream");
-    framesStreamChannel =
-        new EventChannel(messenger, "plugins.flutter.io/camera_android/framesStream");
     Messages.CameraApi.setUp(messenger, this);
   }
 
@@ -177,26 +173,6 @@ final class CameraApiImpl implements Messages.CameraApi {
   @Override
   public void takePicture(@NonNull Messages.Result<String> result) {
     camera.takePicture(result);
-  }
-  @Override
-  public  void capturePreviewFrame(@NonNull Messages.Result<Map<String, Object>> result) {
-    camera.capturePreviewFrame(result);
-  }
-  @Override
-  public void capturePreviewFrameJpeg(@NonNull String outputPath, @NonNull Long rotation, @NonNull Long quality, @NonNull Messages.Result<String> result) {
-    camera.capturePreviewFrameJpeg(outputPath, rotation.intValue(), quality.intValue(),result);
-  }
-  @Override
-  public void saveAsJpeg(@NonNull Map<String, Object> imageData, @NonNull String outputPath, @NonNull Long rotation,@NonNull Long quality, @NonNull Messages.Result<String> result){
-    camera.saveAsJpeg(imageData,outputPath,rotation.intValue(), quality.intValue(),result);
-  }
-  @Override
-  public void startListenFrames() {
-    camera.startListenFrames(framesStreamChannel );
-  }
-@Override
-  public void stopListenFrames() {
-    camera.stopListenFrames();
   }
 
   @Override
