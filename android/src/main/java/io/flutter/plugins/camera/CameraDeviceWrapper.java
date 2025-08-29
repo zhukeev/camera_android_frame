@@ -21,6 +21,7 @@ import java.util.List;
 interface CameraDeviceWrapper {
   @NonNull
   CaptureRequest.Builder createCaptureRequest(int templateType) throws CameraAccessException;
+  
   @SuppressLint("UseRequiresApi")
   @TargetApi(Build.VERSION_CODES.P)
   void createCaptureSession(SessionConfiguration config) throws CameraAccessException;

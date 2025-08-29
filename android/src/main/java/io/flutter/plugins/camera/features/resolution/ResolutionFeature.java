@@ -208,6 +208,7 @@ public class ResolutionFeature extends CameraFeature<ResolutionPreset> {
         }
     }
   }
+
   @SuppressLint("UseRequiresApi")
   @TargetApi(Build.VERSION_CODES.S)
   // All of these cases deliberately fall through to get the best available profile.

@@ -126,6 +126,7 @@ public final class CameraRegionUtils {
     // Build the metering rectangle.
     return MeteringRectangleFactory.create(targetX, targetY, targetWidth, targetHeight, 1);
   }
+  
   @SuppressLint("UseRequiresApi")
   @TargetApi(Build.VERSION_CODES.P)
   private static boolean supportsDistortionCorrection(CameraProperties cameraProperties) {
