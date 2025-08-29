@@ -145,8 +145,7 @@ public class ImageStreamReader {
     final Handler handler =
         this.handler != null ? this.handler : new Handler(Looper.getMainLooper());
 
-    // Keep a hard reference to the latest frame, so it isn't dropped before it
-    // reaches the main
+    // Keep a hard reference to the latest frame, so it isn't dropped before it reaches the main
     // looper
     latestImageBufferHardReference = imageBuffer;
 
