@@ -40,8 +40,7 @@ public class ImageStreamReaderTest {
   }
 
   /**
-   * When we want to stream in NV21, we should still request YUV420 from the
-   * camera because we will
+   * When we want to stream in NV21, we should still request YUV420 from the camera because we will
    * convert it to NV21 before sending it to dart.
    */
   @Test
@@ -52,10 +51,8 @@ public class ImageStreamReaderTest {
   }
 
   /**
-   * If we are requesting NV21, then the planes should be processed and converted
-   * to NV21 before
-   * being sent to dart. We make sure yuv420ThreePlanesToNV21 is called when we
-   * are requesting
+   * If we are requesting NV21, then the planes should be processed and converted to NV21 before
+   * being sent to dart. We make sure yuv420ThreePlanesToNV21 is called when we are requesting
    */
   @Test
   public void onImageAvailable_parsesPlanesForNv21() {
@@ -64,15 +61,14 @@ public class ImageStreamReaderTest {
 
     ImageReader mockImageReader = mock(ImageReader.class);
     ImageStreamReaderUtils mockImageStreamReaderUtils = mock(ImageStreamReaderUtils.class);
-    ImageStreamReader imageStreamReader = new ImageStreamReader(mockImageReader, dartImageFormat,
-        mockImageStreamReaderUtils);
+    ImageStreamReader imageStreamReader =
+        new ImageStreamReader(mockImageReader, dartImageFormat, mockImageStreamReaderUtils);
 
     ByteBuffer mockBytes = ByteBuffer.allocate(0);
     when(mockImageStreamReaderUtils.yuv420ThreePlanesToNV21(any(), anyInt(), anyInt()))
         .thenReturn(mockBytes);
 
-    // Note: the code for getImage() was previously inlined, with uSize set to one
-    // less than
+    // Note: the code for getImage() was previously inlined, with uSize set to one less than
     // getImage() calculates (see function implementation)
     Image mockImage = ImageStreamReaderTestUtils.getImage(1280, 720, 256, ImageFormat.YUV_420_888);
 
@@ -86,9 +82,7 @@ public class ImageStreamReaderTest {
             mockImage.getPlanes(), mockImage.getWidth(), mockImage.getHeight());
   }
 
-  /**
-   * If we are requesting YUV420, then we should send the 3-plane image as it is.
-   */
+  /** If we are requesting YUV420, then we should send the 3-plane image as it is. */
   @Test
   public void onImageAvailable_parsesPlanesForYuv420() {
     // Dart wants NV21 frames
@@ -96,15 +90,14 @@ public class ImageStreamReaderTest {
 
     ImageReader mockImageReader = mock(ImageReader.class);
     ImageStreamReaderUtils mockImageStreamReaderUtils = mock(ImageStreamReaderUtils.class);
-    ImageStreamReader imageStreamReader = new ImageStreamReader(mockImageReader, dartImageFormat,
-        mockImageStreamReaderUtils);
+    ImageStreamReader imageStreamReader =
+        new ImageStreamReader(mockImageReader, dartImageFormat, mockImageStreamReaderUtils);
 
     ByteBuffer mockBytes = ByteBuffer.allocate(0);
     when(mockImageStreamReaderUtils.yuv420ThreePlanesToNV21(any(), anyInt(), anyInt()))
         .thenReturn(mockBytes);
 
-    // Note: the code for getImage() was previously inlined, with uSize set to one
-    // less than
+    // Note: the code for getImage() was previously inlined, with uSize set to one less than
     // getImage() calculates (see function implementation)
     Image mockImage = ImageStreamReaderTestUtils.getImage(1280, 720, 256, ImageFormat.YUV_420_888);
 
@@ -122,17 +115,16 @@ public class ImageStreamReaderTest {
 
     ImageReader mockImageReader = mock(ImageReader.class);
     ImageStreamReaderUtils mockImageStreamReaderUtils = mock(ImageStreamReaderUtils.class);
-    ImageStreamReader imageStreamReader = new ImageStreamReader(mockImageReader, dartImageFormat,
-        mockImageStreamReaderUtils);
+    ImageStreamReader imageStreamReader =
+        new ImageStreamReader(mockImageReader, dartImageFormat, mockImageStreamReaderUtils);
 
-    for (boolean invalidateWeakReference : new boolean[] { true, false }) {
+    for (boolean invalidateWeakReference : new boolean[] {true, false}) {
       final List<Runnable> runnables = new ArrayList<Runnable>();
 
       Handler mockHandler = mock(Handler.class);
       imageStreamReader.handler = mockHandler;
 
-      // initially, handler will simulate a hanging main looper, that only queues
-      // inputs
+      // initially, handler will simulate a hanging main looper, that only queues inputs
       when(mockHandler.post(any(Runnable.class)))
           .thenAnswer(
               inputs -> {
@@ -144,7 +136,8 @@ public class ImageStreamReaderTest {
       CameraCaptureProperties mockCaptureProps = mock(CameraCaptureProperties.class);
       EventChannel.EventSink mockEventSink = mock(EventChannel.EventSink.class);
 
-      Image mockImage = ImageStreamReaderTestUtils.getImage(1280, 720, 256, ImageFormat.YUV_420_888);
+      Image mockImage =
+          ImageStreamReaderTestUtils.getImage(1280, 720, 256, ImageFormat.YUV_420_888);
       imageStreamReader.onImageAvailable(mockImage, mockCaptureProps, mockEventSink);
 
       // make sure the image was closed, even when skipping frames
