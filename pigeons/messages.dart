@@ -11,6 +11,7 @@ import 'package:pigeon/pigeon.dart';
     copyrightHeader: 'pigeons/copyright.txt',
   ),
 )
+
 /// Pigeon equivalent of [CameraLensDirection].
 enum PlatformCameraLensDirection { front, back, external }
 

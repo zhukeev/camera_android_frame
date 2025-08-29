@@ -11,7 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:video_player/video_player.dart';
- 
+
 /// Camera example home widget.
 class CameraExampleHome extends StatefulWidget {
   /// Default Constructor
@@ -1032,7 +1032,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       final sw = Stopwatch()..start();
 
       final frame = await cameraController.capturePreviewFrame();
-  
+
       await cameraController.saveAsJpeg(frame, file.path, 90, 90);
       print(
           'first frame took ${sw.elapsedMilliseconds} ms ${frame.width}x${frame.height}');
@@ -1042,7 +1042,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       Future.delayed(Duration(seconds: 5), () {
         cameraController.stopFrameStream();
         print('stopped frame stream');
-      }); 
+      });
 
       await cameraController.startFrameStream((frame) {
         print(
