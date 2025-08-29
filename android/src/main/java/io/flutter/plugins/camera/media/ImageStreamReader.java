@@ -73,7 +73,8 @@ public class ImageStreamReader {
    */
   public ImageStreamReader(int width, int height, int imageFormat, int maxImages) {
     this.dartImageFormat = imageFormat;
-    this.imageReader = ImageReader.newInstance(width, height, computeStreamImageFormat(imageFormat), maxImages);
+    this.imageReader =
+        ImageReader.newInstance(width, height, computeStreamImageFormat(imageFormat), maxImages);
     this.imageStreamReaderUtils = new ImageStreamReaderUtils();
   }
 
@@ -97,11 +98,11 @@ public class ImageStreamReader {
   /**
    * Processes a new frame (image) from the image reader and send the frame to Dart.
    *
-   * @param image           is the image which needs processed as an {@link Image}
-   * @param captureProps    is the capture props from the camera class as {@link
-   *                        CameraCaptureProperties}
+   * @param image is the image which needs processed as an {@link Image}
+   * @param captureProps is the capture props from the camera class as {@link
+   *     CameraCaptureProperties}
    * @param imageStreamSink is the image stream sink from dart as a dart {@link
-   *                        EventChannel.EventSink}
+   *     EventChannel.EventSink}
    */
   @VisibleForTesting
   public void onImageAvailable(
@@ -122,12 +123,14 @@ public class ImageStreamReader {
     } catch (IllegalStateException e) {
       // Handle "buffer is inaccessible" errors that can happen on some devices from
       // ImageStreamReaderUtils.yuv420ThreePlanesToNV21()
-      final Handler handler = this.handler != null ? this.handler : new Handler(Looper.getMainLooper());
+      final Handler handler =
+          this.handler != null ? this.handler : new Handler(Looper.getMainLooper());
       handler.post(
-          () -> imageStreamSink.error(
-              "IllegalStateException",
-              "Caught IllegalStateException: " + e.getMessage(),
-              null));
+          () ->
+              imageStreamSink.error(
+                  "IllegalStateException",
+                  "Caught IllegalStateException: " + e.getMessage(),
+                  null));
     } finally {
       image.close();
     }
@@ -139,36 +142,37 @@ public class ImageStreamReader {
     imageBuffer.put(
         "sensorSensitivity", sensorSensitivity == null ? null : (double) sensorSensitivity);
 
-    final Handler handler = this.handler != null ? this.handler : new Handler(Looper.getMainLooper());
+    final Handler handler =
+        this.handler != null ? this.handler : new Handler(Looper.getMainLooper());
 
     // Keep a hard reference to the latest frame, so it isn't dropped before it
     // reaches the main
     // looper
     latestImageBufferHardReference = imageBuffer;
 
-    boolean postResult = handler.post(
-        new Runnable() {
-          @VisibleForTesting
-          public WeakReference<Map<String, Object>> weakImageBuffer;
+    boolean postResult =
+        handler.post(
+            new Runnable() {
+              @VisibleForTesting public WeakReference<Map<String, Object>> weakImageBuffer;
 
-          public Runnable withImageBuffer(Map<String, Object> imageBuffer) {
-            weakImageBuffer = new WeakReference<>(imageBuffer);
-            return this;
-          }
+              public Runnable withImageBuffer(Map<String, Object> imageBuffer) {
+                weakImageBuffer = new WeakReference<>(imageBuffer);
+                return this;
+              }
 
-          @Override
-          public void run() {
-            final Map<String, Object> imageBuffer = weakImageBuffer.get();
-            if (imageBuffer == null) {
-              // The memory was freed by the runtime, most likely due to a memory build-up
-              // while the main thread was lagging. Frames are silently dropped in this
-              // case.
-              Log.d(TAG, "Image buffer was dropped by garbage collector.");
-              return;
-            }
-            imageStreamSink.success(imageBuffer);
-          }
-        }.withImageBuffer(imageBuffer));
+              @Override
+              public void run() {
+                final Map<String, Object> imageBuffer = weakImageBuffer.get();
+                if (imageBuffer == null) {
+                  // The memory was freed by the runtime, most likely due to a memory build-up
+                  // while the main thread was lagging. Frames are silently dropped in this
+                  // case.
+                  Log.d(TAG, "Image buffer was dropped by garbage collector.");
+                  return;
+                }
+                imageStreamSink.success(imageBuffer);
+              }
+            }.withImageBuffer(imageBuffer));
   }
 
   public static Map<String, Object> decodeImage(
@@ -181,7 +185,9 @@ public class ImageStreamReader {
 
       // Get plane data ready
       if (imageFormat == ImageFormat.NV21) {
-        ByteBuffer bytes = imageUtils.yuv420ThreePlanesToNV21(image.getPlanes(), image.getWidth(), image.getHeight());
+        ByteBuffer bytes =
+            imageUtils.yuv420ThreePlanesToNV21(
+                image.getPlanes(), image.getWidth(), image.getHeight());
         Map<String, Object> plane = new HashMap<>();
         plane.put("bytesPerRow", image.getWidth());
         plane.put("bytesPerPixel", 1);
@@ -208,7 +214,8 @@ public class ImageStreamReader {
       imageBuffer.put("lensAperture", captureProps.getLastLensAperture());
       imageBuffer.put("sensorExposureTime", captureProps.getLastSensorExposureTime());
       Integer sensorSensitivity = captureProps.getLastSensorSensitivity();
-      imageBuffer.put("sensorSensitivity", sensorSensitivity == null ? null : (double) sensorSensitivity);
+      imageBuffer.put(
+          "sensorSensitivity", sensorSensitivity == null ? null : (double) sensorSensitivity);
 
       return imageBuffer;
     } catch (IllegalStateException e) {
@@ -217,13 +224,10 @@ public class ImageStreamReader {
   }
 
   /**
-   * Given an input image, will return a list of maps suitable to send back to
-   * dart where each map
+   * Given an input image, will return a list of maps suitable to send back to dart where each map
    * describes the image plane.
    *
-   * <p>
-   * For Yuv / Jpeg, we do no further processing on the frame so we simply send it
-   * as-is.
+   * <p>For Yuv / Jpeg, we do no further processing on the frame so we simply send it as-is.
    *
    * @param image - the image to process.
    * @return parsed map describing the image planes to be sent to dart.
@@ -250,8 +254,7 @@ public class ImageStreamReader {
   }
 
   /**
-   * Given an input image, will return a single-plane NV21 image. Assumes YUV420
-   * as an input type.
+   * Given an input image, will return a single-plane NV21 image. Assumes YUV420 as an input type.
    *
    * @param image - the image to process.
    * @return parsed map describing the image planes to be sent to dart.
@@ -261,8 +264,9 @@ public class ImageStreamReader {
     List<Map<String, Object>> planes = new ArrayList<>();
 
     // We will convert the YUV data to NV21 which is a single-plane image
-    ByteBuffer bytes = imageStreamReaderUtils.yuv420ThreePlanesToNV21(
-        image.getPlanes(), image.getWidth(), image.getHeight());
+    ByteBuffer bytes =
+        imageStreamReaderUtils.yuv420ThreePlanesToNV21(
+            image.getPlanes(), image.getWidth(), image.getHeight());
 
     Map<String, Object> planeBuffer = new HashMap<>();
     planeBuffer.put("bytesPerRow", image.getWidth());
@@ -279,15 +283,12 @@ public class ImageStreamReader {
   }
 
   /**
-   * Subscribes the image stream reader to handle incoming images using
-   * onImageAvailable().
+   * Subscribes the image stream reader to handle incoming images using onImageAvailable().
    *
-   * @param captureProps    is the capture props from the camera class as {@link
-   *                        CameraCaptureProperties}
-   * @param imageStreamSink is the image stream sink from dart as
-   *                        {@link EventChannel.EventSink}
-   * @param handler         is generally the background handler of the camera as
-   *                        {@link Handler}
+   * @param captureProps is the capture props from the camera class as {@link
+   *     CameraCaptureProperties}
+   * @param imageStreamSink is the image stream sink from dart as {@link EventChannel.EventSink}
+   * @param handler is generally the background handler of the camera as {@link Handler}
    */
   public void subscribeListener(
       @NonNull CameraCaptureProperties captureProps,
@@ -296,8 +297,7 @@ public class ImageStreamReader {
     imageReader.setOnImageAvailableListener(
         reader -> {
           Image image = reader.acquireNextImage();
-          if (image == null)
-            return;
+          if (image == null) return;
 
           onImageAvailable(image, captureProps, imageStreamSink);
         },
