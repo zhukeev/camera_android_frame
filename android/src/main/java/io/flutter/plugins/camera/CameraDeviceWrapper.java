@@ -4,6 +4,7 @@
 
 package io.flutter.plugins.camera;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -20,7 +21,7 @@ import java.util.List;
 interface CameraDeviceWrapper {
   @NonNull
   CaptureRequest.Builder createCaptureRequest(int templateType) throws CameraAccessException;
-
+  @SuppressLint("UseRequiresApi")
   @TargetApi(Build.VERSION_CODES.P)
   void createCaptureSession(SessionConfiguration config) throws CameraAccessException;
 
