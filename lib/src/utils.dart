@@ -4,34 +4,28 @@
 
 import 'dart:math';
 
-import 'package:camera_platform_interface/camera_platform_interface.dart';
+import 'package:camera_platform_interface_frame/camera_platform_interface_frame.dart';
 import 'package:flutter/services.dart';
 
 import 'messages.g.dart';
 
 /// Converts a [PlatformCameraLensDirection] to [CameraLensDirection].
-CameraLensDirection cameraLensDirectionFromPlatform(
-  PlatformCameraLensDirection direction,
-) => switch (direction) {
-  PlatformCameraLensDirection.front => CameraLensDirection.front,
-  PlatformCameraLensDirection.back => CameraLensDirection.back,
-  PlatformCameraLensDirection.external => CameraLensDirection.external,
-};
+CameraLensDirection cameraLensDirectionFromPlatform(PlatformCameraLensDirection direction) => switch (direction) {
+      PlatformCameraLensDirection.front => CameraLensDirection.front,
+      PlatformCameraLensDirection.back => CameraLensDirection.back,
+      PlatformCameraLensDirection.external => CameraLensDirection.external,
+    };
 
 /// Converts a [PlatformDeviceOrientation] to [DeviceOrientation].
-DeviceOrientation deviceOrientationFromPlatform(
-  PlatformDeviceOrientation orientation,
-) => switch (orientation) {
-  PlatformDeviceOrientation.portraitUp => DeviceOrientation.portraitUp,
-  PlatformDeviceOrientation.portraitDown => DeviceOrientation.portraitDown,
-  PlatformDeviceOrientation.landscapeLeft => DeviceOrientation.landscapeLeft,
-  PlatformDeviceOrientation.landscapeRight => DeviceOrientation.landscapeRight,
-};
+DeviceOrientation deviceOrientationFromPlatform(PlatformDeviceOrientation orientation) => switch (orientation) {
+      PlatformDeviceOrientation.portraitUp => DeviceOrientation.portraitUp,
+      PlatformDeviceOrientation.portraitDown => DeviceOrientation.portraitDown,
+      PlatformDeviceOrientation.landscapeLeft => DeviceOrientation.landscapeLeft,
+      PlatformDeviceOrientation.landscapeRight => DeviceOrientation.landscapeRight,
+    };
 
 /// Converts a [DeviceOrientation] to [PlatformDeviceOrientation].
-PlatformDeviceOrientation deviceOrientationToPlatform(
-  DeviceOrientation orientation,
-) {
+PlatformDeviceOrientation deviceOrientationToPlatform(DeviceOrientation orientation) {
   switch (orientation) {
     case DeviceOrientation.portraitUp:
       return PlatformDeviceOrientation.portraitUp;
@@ -49,8 +43,7 @@ PlatformDeviceOrientation deviceOrientationToPlatform(
 }
 
 /// Converts a [PlatformExposureMode] to [ExposureMode].
-ExposureMode exposureModeFromPlatform(PlatformExposureMode exposureMode) =>
-    switch (exposureMode) {
+ExposureMode exposureModeFromPlatform(PlatformExposureMode exposureMode) => switch (exposureMode) {
       PlatformExposureMode.auto => ExposureMode.auto,
       PlatformExposureMode.locked => ExposureMode.locked,
     };
@@ -70,8 +63,7 @@ PlatformExposureMode exposureModeToPlatform(ExposureMode exposureMode) {
 }
 
 /// Converts a [PlatformFocusMode] to [FocusMode].
-FocusMode focusModeFromPlatform(PlatformFocusMode focusMode) =>
-    switch (focusMode) {
+FocusMode focusModeFromPlatform(PlatformFocusMode focusMode) => switch (focusMode) {
       PlatformFocusMode.auto => FocusMode.auto,
       PlatformFocusMode.locked => FocusMode.locked,
     };
@@ -91,8 +83,7 @@ PlatformFocusMode focusModeToPlatform(FocusMode focusMode) {
 }
 
 /// Converts a [ResolutionPreset] to [PlatformResolutionPreset].
-PlatformResolutionPreset resolutionPresetToPlatform(ResolutionPreset? preset) =>
-    switch (preset) {
+PlatformResolutionPreset resolutionPresetToPlatform(ResolutionPreset? preset) => switch (preset) {
       ResolutionPreset.low => PlatformResolutionPreset.low,
       ResolutionPreset.medium => PlatformResolutionPreset.medium,
       ResolutionPreset.high => PlatformResolutionPreset.high,
@@ -103,14 +94,12 @@ PlatformResolutionPreset resolutionPresetToPlatform(ResolutionPreset? preset) =>
     };
 
 /// Converts a [MediaSettings] to [PlatformMediaSettings].
-PlatformMediaSettings mediaSettingsToPlatform(MediaSettings? settings) =>
-    PlatformMediaSettings(
-      resolutionPreset: resolutionPresetToPlatform(settings?.resolutionPreset),
-      enableAudio: settings?.enableAudio ?? false,
-      videoBitrate: settings?.videoBitrate,
-      audioBitrate: settings?.audioBitrate,
-      fps: settings?.fps,
-    );
+PlatformMediaSettings mediaSettingsToPlatform(MediaSettings? settings) => PlatformMediaSettings(
+    resolutionPreset: resolutionPresetToPlatform(settings?.resolutionPreset),
+    enableAudio: settings?.enableAudio ?? false,
+    videoBitrate: settings?.videoBitrate,
+    audioBitrate: settings?.audioBitrate,
+    fps: settings?.fps);
 
 /// Converts an [ImageFormatGroup] to [PlatformImageFormatGroup].
 ///
@@ -156,5 +145,4 @@ PlatformFlashMode flashModeToPlatform(FlashMode mode) {
 /// Converts a [Point<double>] to [PlatformPoint].
 ///
 /// Null becomes null.
-PlatformPoint? pointToPlatform(Point<double>? point) =>
-    (point != null) ? PlatformPoint(x: point.x, y: point.y) : null;
+PlatformPoint? pointToPlatform(Point<double>? point) => (point != null) ? PlatformPoint(x: point.x, y: point.y) : null;
