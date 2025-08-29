@@ -28,10 +28,8 @@ public class ImageStreamReader {
   private static final String TAG = "ImageStreamReader";
 
   /**
-   * The image format we are going to send back to dart. Usually it's the same as
-   * streamImageFormat
-   * but in the case of NV21 we will actually request YUV frames but convert it to
-   * NV21 before
+   * The image format we are going to send back to dart. Usually it's the same as streamImageFormat
+   * but in the case of NV21 we will actually request YUV frames but convert it to NV21 before
    * sending to dart.
    */
   private final int dartImageFormat;
@@ -44,8 +42,7 @@ public class ImageStreamReader {
   public Handler handler;
 
   /**
-   * This hard reference is required so frames don't get randomly dropped before
-   * reaching the main
+   * This hard reference is required so frames don't get randomly dropped before reaching the main
    * looper.
    */
   private Map<String, Object> latestImageBufferHardReference = null;
@@ -53,9 +50,8 @@ public class ImageStreamReader {
   /**
    * Creates a new instance of the {@link ImageStreamReader}.
    *
-   * @param imageReader            is the image reader that will receive frames
-   * @param imageStreamReaderUtils is an instance of
-   *                               {@link ImageStreamReaderUtils}
+   * @param imageReader is the image reader that will receive frames
+   * @param imageStreamReaderUtils is an instance of {@link ImageStreamReaderUtils}
    */
   @VisibleForTesting
   public ImageStreamReader(
@@ -70,11 +66,10 @@ public class ImageStreamReader {
   /**
    * Creates a new instance of the {@link ImageStreamReader}.
    *
-   * @param width       is the image width
-   * @param height      is the image height
-   * @param imageFormat is the {@link ImageFormat} that should be returned to
-   *                    dart.
-   * @param maxImages   is how many images can be acquired at one time, usually 1.
+   * @param width is the image width
+   * @param height is the image height
+   * @param imageFormat is the {@link ImageFormat} that should be returned to dart.
+   * @param maxImages is how many images can be acquired at one time, usually 1.
    */
   public ImageStreamReader(int width, int height, int imageFormat, int maxImages) {
     this.dartImageFormat = imageFormat;
@@ -83,10 +78,8 @@ public class ImageStreamReader {
   }
 
   /**
-   * Returns the image format to stream based on a requested input format. Usually
-   * it's the same
-   * except when dart is requesting NV21. In that case we stream YUV420 and
-   * process it into NV21
+   * Returns the image format to stream based on a requested input format. Usually it's the same
+   * except when dart is requesting NV21. In that case we stream YUV420 and process it into NV21
    * before sending the frames over.
    *
    * @param dartImageFormat is the image format dart is requesting.
@@ -102,8 +95,7 @@ public class ImageStreamReader {
   }
 
   /**
-   * Processes a new frame (image) from the image reader and send the frame to
-   * Dart.
+   * Processes a new frame (image) from the image reader and send the frame to Dart.
    *
    * @param image           is the image which needs processed as an {@link Image}
    * @param captureProps    is the capture props from the camera class as {@link
