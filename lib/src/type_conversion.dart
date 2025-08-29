@@ -16,10 +16,8 @@ CameraImageData cameraImageFromPlatformData(Map<dynamic, dynamic> data) {
       lensAperture: data['lensAperture'] as double?,
       sensorExposureTime: data['sensorExposureTime'] as int?,
       sensorSensitivity: data['sensorSensitivity'] as double?,
-      planes: List<CameraImagePlane>.unmodifiable(
-          (data['planes'] as List<dynamic>).map<CameraImagePlane>(
-              (dynamic planeData) => _cameraImagePlaneFromPlatformData(
-                  planeData as Map<dynamic, dynamic>))));
+      planes: List<CameraImagePlane>.unmodifiable((data['planes'] as List<dynamic>).map<CameraImagePlane>(
+          (dynamic planeData) => _cameraImagePlaneFromPlatformData(planeData as Map<dynamic, dynamic>))));
 }
 
 Map<String, dynamic> imageDataToPlatformData(CameraImageData imageData) {

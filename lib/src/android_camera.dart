@@ -17,8 +17,7 @@ import 'utils.dart';
 /// The Android implementation of [CameraPlatform] that uses method channels.
 class AndroidCamera extends CameraPlatform {
   /// Creates a new [CameraPlatform] instance.
-  AndroidCamera({@visibleForTesting CameraApi? hostApi})
-      : _hostApi = hostApi ?? CameraApi();
+  AndroidCamera({@visibleForTesting CameraApi? hostApi}) : _hostApi = hostApi ?? CameraApi();
 
   /// Registers this class as the default instance of [CameraPlatform].
   static void registerWith() {
@@ -30,8 +29,7 @@ class AndroidCamera extends CameraPlatform {
   /// The name of the channel that device events from the platform side are
   /// sent on.
   @visibleForTesting
-  static const String deviceEventChannelName =
-      'plugins.flutter.io/camera_android/fromPlatform';
+  static const String deviceEventChannelName = 'plugins.flutter.io/camera_android/fromPlatform';
 
   /// The controller we need to broadcast the different events coming
   /// from handleMethodCall, specific to camera events.
@@ -41,8 +39,7 @@ class AndroidCamera extends CameraPlatform {
   /// This is only exposed for test purposes. It shouldn't be used by clients of
   /// the plugin as it may break or change at any time.
   @visibleForTesting
-  final StreamController<CameraEvent> cameraEventStreamController =
-      StreamController<CameraEvent>.broadcast();
+  final StreamController<CameraEvent> cameraEventStreamController = StreamController<CameraEvent>.broadcast();
 
   /// Handler for device-level callbacks from the native side.
   @visibleForTesting
@@ -51,8 +48,7 @@ class AndroidCamera extends CameraPlatform {
   /// Map of camera IDs to camera-level callback handlers listening to their
   /// respective platform channels.
   @visibleForTesting
-  final Map<int, HostCameraMessageHandler> hostCameraHandlers =
-      <int, HostCameraMessageHandler>{};
+  final Map<int, HostCameraMessageHandler> hostCameraHandlers = <int, HostCameraMessageHandler>{};
 
   // The stream to receive frames from the native code.
   StreamSubscription<dynamic>? _platformImageStreamSubscription;
@@ -61,8 +57,7 @@ class AndroidCamera extends CameraPlatform {
   StreamController<CameraImageData>? _frameStreamController;
 
   Stream<CameraEvent> _cameraEvents(int cameraId) =>
-      cameraEventStreamController.stream
-          .where((CameraEvent event) => event.cameraId == cameraId);
+      cameraEventStreamController.stream.where((CameraEvent event) => event.cameraId == cameraId);
 
   // The stream to receive frames from the native code.
   StreamSubscription<dynamic>? _platformFramesStreamSubscription;
@@ -73,8 +68,7 @@ class AndroidCamera extends CameraPlatform {
   @override
   Future<List<CameraDescription>> availableCameras() async {
     try {
-      final List<PlatformCameraDescription> cameraDescriptions =
-          await _hostApi.getAvailableCameras();
+      final List<PlatformCameraDescription> cameraDescriptions = await _hostApi.getAvailableCameras();
       return cameraDescriptions.map((
         PlatformCameraDescription cameraDescription,
       ) {
@@ -99,8 +93,7 @@ class AndroidCamera extends CameraPlatform {
   }) =>
       createCameraWithSettings(
         cameraDescription,
-        MediaSettings(
-            resolutionPreset: resolutionPreset, enableAudio: enableAudio),
+        MediaSettings(resolutionPreset: resolutionPreset, enableAudio: enableAudio),
       );
 
   @override
@@ -182,8 +175,7 @@ class AndroidCamera extends CameraPlatform {
 
   @override
   Stream<DeviceOrientationChangedEvent> onDeviceOrientationChanged() {
-    return hostHandler.deviceEventStreamController.stream
-        .whereType<DeviceOrientationChangedEvent>();
+    return hostHandler.deviceEventStreamController.stream.whereType<DeviceOrientationChangedEvent>();
   }
 
   @override
@@ -214,27 +206,20 @@ class AndroidCamera extends CameraPlatform {
   }
 
   @override
-  Future<XFile> saveAsJpeg(CameraImageData imageData, String outputPath,
-      int rotation, int quality) async {
+  Future<XFile> saveAsJpeg(CameraImageData imageData, String outputPath, int rotation, int quality) async {
     final filePath = await _hostApi.saveAsJpeg(
-        imageDataToPlatformData(imageData).cast<String, Object>(),
-        outputPath,
-        rotation,
-        quality);
+        imageDataToPlatformData(imageData).cast<String, Object>(), outputPath, rotation, quality);
     return XFile(filePath);
   }
 
   @override
-  Future<XFile> capturePreviewFrameJpeg(String outputPath,
-      [int rotation = 0, int quality = 100]) async {
-    final path =
-        await _hostApi.capturePreviewFrameJpeg(outputPath, rotation, quality);
+  Future<XFile> capturePreviewFrameJpeg(String outputPath, [int rotation = 0, int quality = 100]) async {
+    final path = await _hostApi.capturePreviewFrameJpeg(outputPath, rotation, quality);
     return XFile(path);
   }
 
   @override
-  Future<void> startListenFrames(
-      {void Function(CameraImageData image)? frameCallback}) async {
+  Future<void> startListenFrames({void Function(CameraImageData image)? frameCallback}) async {
     await _hostApi.startListenFrames();
     _startFramesStreamListener();
     _installFramesStreamController().stream.listen(frameCallback);
@@ -275,12 +260,10 @@ class AndroidCamera extends CameraPlatform {
   }
 
   @override
-  Future<void> pauseVideoRecording(int cameraId) =>
-      _hostApi.pauseVideoRecording();
+  Future<void> pauseVideoRecording(int cameraId) => _hostApi.pauseVideoRecording();
 
   @override
-  Future<void> resumeVideoRecording(int cameraId) =>
-      _hostApi.resumeVideoRecording();
+  Future<void> resumeVideoRecording(int cameraId) => _hostApi.resumeVideoRecording();
 
   @override
   bool supportsImageStreaming() => true;
@@ -306,8 +289,7 @@ class AndroidCamera extends CameraPlatform {
     return _frameStreamController!;
   }
 
-  StreamController<CameraImageData> _installFramesStreamController(
-      {void Function()? onListen}) {
+  StreamController<CameraImageData> _installFramesStreamController({void Function()? onListen}) {
     _framesStreamController = StreamController<CameraImageData>(
       onListen: onListen ?? () {},
       onPause: _onFramesStreamPauseResume,
@@ -330,20 +312,15 @@ class AndroidCamera extends CameraPlatform {
     const EventChannel cameraEventChannel = EventChannel(
       'plugins.flutter.io/camera_android/imageStream',
     );
-    _platformImageStreamSubscription =
-        cameraEventChannel.receiveBroadcastStream().listen((dynamic imageData) {
-      _frameStreamController!
-          .add(cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>));
+    _platformImageStreamSubscription = cameraEventChannel.receiveBroadcastStream().listen((dynamic imageData) {
+      _frameStreamController!.add(cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>));
     });
   }
 
   void _startFramesStreamListener() {
-    const EventChannel framesEventChannel =
-        EventChannel('plugins.flutter.io/camera_android/framesStream');
-    _platformImageStreamSubscription =
-        framesEventChannel.receiveBroadcastStream().listen((dynamic imageData) {
-      _framesStreamController!
-          .add(cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>));
+    const EventChannel framesEventChannel = EventChannel('plugins.flutter.io/camera_android/framesStream');
+    _platformImageStreamSubscription = framesEventChannel.receiveBroadcastStream().listen((dynamic imageData) {
+      _framesStreamController!.add(cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>));
     });
   }
 
@@ -376,8 +353,7 @@ class AndroidCamera extends CameraPlatform {
   }
 
   @override
-  Future<void> setFlashMode(int cameraId, FlashMode mode) =>
-      _hostApi.setFlashMode(flashModeToPlatform(mode));
+  Future<void> setFlashMode(int cameraId, FlashMode mode) => _hostApi.setFlashMode(flashModeToPlatform(mode));
 
   @override
   Future<void> setExposureMode(int cameraId, ExposureMode mode) =>
@@ -412,8 +388,7 @@ class AndroidCamera extends CameraPlatform {
   }
 
   @override
-  Future<void> setFocusMode(int cameraId, FocusMode mode) =>
-      _hostApi.setFocusMode(focusModeToPlatform(mode));
+  Future<void> setFocusMode(int cameraId, FocusMode mode) => _hostApi.setFocusMode(focusModeToPlatform(mode));
 
   @override
   Future<void> setFocusPoint(int cameraId, Point<double>? point) {
@@ -474,8 +449,7 @@ class HostDeviceMessageHandler implements CameraGlobalEventApi {
   }
 
   /// The controller that broadcasts device events coming from the host platform.
-  final StreamController<DeviceEvent> deviceEventStreamController =
-      StreamController<DeviceEvent>.broadcast();
+  final StreamController<DeviceEvent> deviceEventStreamController = StreamController<DeviceEvent>.broadcast();
   @override
   void deviceOrientationChanged(PlatformDeviceOrientation orientation) {
     deviceEventStreamController.add(
