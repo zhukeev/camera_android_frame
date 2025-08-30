@@ -1,3 +1,7 @@
+## 0.10.19
+
+- feat(android): sync up `camera_android` to upstream (**^0.10.10+6**)
+
 ## 0.10.18
 
 - `capturePreviewFrameJpeg` added paraeters `quality`, `rotation`
