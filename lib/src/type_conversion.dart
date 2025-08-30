@@ -10,16 +10,19 @@ import 'package:camera_platform_interface_frame/camera_platform_interface_frame.
 /// [CameraImageData].
 CameraImageData cameraImageFromPlatformData(Map<dynamic, dynamic> data) {
   return CameraImageData(
-      format: _cameraImageFormatFromPlatformData(data['format']),
-      height: data['height'] as int,
-      width: data['width'] as int,
-      lensAperture: data['lensAperture'] as double?,
-      sensorExposureTime: data['sensorExposureTime'] as int?,
-      sensorSensitivity: data['sensorSensitivity'] as double?,
-      planes: List<CameraImagePlane>.unmodifiable(
-          (data['planes'] as List<dynamic>).map<CameraImagePlane>(
-              (dynamic planeData) => _cameraImagePlaneFromPlatformData(
-                  planeData as Map<dynamic, dynamic>))));
+    format: _cameraImageFormatFromPlatformData(data['format']),
+    height: data['height'] as int,
+    width: data['width'] as int,
+    lensAperture: data['lensAperture'] as double?,
+    sensorExposureTime: data['sensorExposureTime'] as int?,
+    sensorSensitivity: data['sensorSensitivity'] as double?,
+    planes: List<CameraImagePlane>.unmodifiable(
+      (data['planes'] as List<dynamic>).map<CameraImagePlane>(
+        (dynamic planeData) => _cameraImagePlaneFromPlatformData(
+            planeData as Map<dynamic, dynamic>),
+      ),
+    ),
+  );
 }
 
 Map<String, dynamic> imageDataToPlatformData(CameraImageData imageData) {
@@ -61,9 +64,10 @@ ImageFormatGroup _imageFormatGroupFromPlatformData(dynamic data) {
 
 CameraImagePlane _cameraImagePlaneFromPlatformData(Map<dynamic, dynamic> data) {
   return CameraImagePlane(
-      bytes: data['bytes'] as Uint8List,
-      bytesPerPixel: data['bytesPerPixel'] as int?,
-      bytesPerRow: data['bytesPerRow'] as int,
-      height: data['height'] as int?,
-      width: data['width'] as int?);
+    bytes: data['bytes'] as Uint8List,
+    bytesPerPixel: data['bytesPerPixel'] as int?,
+    bytesPerRow: data['bytesPerRow'] as int,
+    height: data['height'] as int?,
+    width: data['width'] as int?,
+  );
 }
