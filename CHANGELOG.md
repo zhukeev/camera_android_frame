@@ -1,3 +1,8 @@
+## 0.10.20
+
+- updated camera_platform_interface_frame to 2.10.10
+
+
 ## 0.10.19
 
 - feat(android): sync up `camera_android` to upstream (**^0.10.10+6**)

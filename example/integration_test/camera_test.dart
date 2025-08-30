@@ -85,8 +85,9 @@ void main() {
         for (final MapEntry<ResolutionPreset, Size> preset
             in presetExpectedSizes.entries) {
           final CameraController controller = CameraController(
-              cameraDescription,
-              mediaSettings: MediaSettings(resolutionPreset: preset.key));
+            cameraDescription,
+            preset.key,
+          );
           await controller.initialize();
           await controller.prepareForVideoRecording();
           final bool presetExactlySupported =
@@ -109,7 +110,10 @@ void main() {
       return;
     }
 
-    final CameraController controller = CameraController(cameras[0]);
+    final CameraController controller = CameraController(
+      cameras[0],
+      ResolutionPreset.medium,
+    );
 
     await controller.initialize();
     await controller.prepareForVideoRecording();
@@ -159,7 +163,10 @@ void main() {
       return;
     }
 
-    final CameraController controller = CameraController(cameras[0]);
+    final CameraController controller = CameraController(
+      cameras[0],
+      ResolutionPreset.medium,
+    );
 
     await controller.initialize();
     await controller.prepareForVideoRecording();
@@ -196,7 +203,8 @@ void main() {
       return;
     }
 
-    final CameraController controller = CameraController(cameras[0]);
+    final CameraController controller =
+        CameraController(cameras[0], ResolutionPreset.medium);
 
     await controller.initialize();
     await controller.setDescription(cameras[1]);
@@ -213,7 +221,8 @@ void main() {
         return;
       }
 
-      final CameraController controller = CameraController(cameras[0]);
+      final CameraController controller =
+          CameraController(cameras[0], ResolutionPreset.medium);
 
       await controller.initialize();
       bool isDetecting = false;
@@ -246,13 +255,16 @@ void main() {
         return;
       }
 
-      final CameraController controller = CameraController(cameras[0]);
+      final CameraController controller = CameraController(
+        cameras[0],
+        ResolutionPreset.medium,
+      );
 
       await controller.initialize();
       bool isDetecting = false;
 
       await controller.startVideoRecording(
-          streamCallback: (CameraImageData image) {
+          onAvailable: (CameraImageData image) {
         if (isDetecting) {
           return;
         }
@@ -314,8 +326,8 @@ void main() {
       for (final int fps in <int>[10, 30]) {
         final CameraController controller = CameraController(
           cameraDescription,
-          mediaSettings: MediaSettings(
-              resolutionPreset: ResolutionPreset.medium, fps: fps),
+          ResolutionPreset.medium,
+          fps: fps,
         );
 
         await startRecording(controller);
@@ -345,9 +357,8 @@ void main() {
       for (final int videoBitrate in <int>[200 * kiloBits, 2000 * kiloBits]) {
         final CameraController controller = CameraController(
           cameraDescription,
-          mediaSettings: MediaSettings(
-              resolutionPreset: ResolutionPreset.medium,
-              videoBitrate: videoBitrate),
+          ResolutionPreset.medium,
+          videoBitrate: videoBitrate,
         );
 
         await startRecording(controller);
@@ -379,15 +390,13 @@ void main() {
       for (final int audioBitrate in <int>[32 * kiloBits, 256 * kiloBits]) {
         final CameraController controller = CameraController(
           cameraDescription,
-          mediaSettings: MediaSettings(
-            //region Use lowest video settings for minimize video impact on bitrate
-            resolutionPreset: ResolutionPreset.low,
-            fps: 10,
-            videoBitrate: 64 * kiloBits,
-            //endregion
-            audioBitrate: audioBitrate,
-            enableAudio: true,
-          ),
+          //region Use lowest video settings for minimize video impact on bitrate
+          ResolutionPreset.low,
+          fps: 10,
+          videoBitrate: 64 * kiloBits,
+          //endregion
+          audioBitrate: audioBitrate,
+          enableAudio: true,
         );
 
         await startRecording(controller);

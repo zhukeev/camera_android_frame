@@ -638,11 +638,8 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       CameraDescription cameraDescription) async {
     final CameraController cameraController = CameraController(
       cameraDescription,
-      mediaSettings: MediaSettings(
-        resolutionPreset:
-            kIsWeb ? ResolutionPreset.max : ResolutionPreset.medium,
-        enableAudio: enableAudio,
-      ),
+      ResolutionPreset.medium,
+      enableAudio: enableAudio,
       imageFormatGroup: ImageFormatGroup.nv21,
     );
 
