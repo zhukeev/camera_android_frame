@@ -4,7 +4,7 @@
 
 import 'dart:typed_data';
 
-import 'package:camera_platform_interface/camera_platform_interface.dart';
+import 'package:camera_platform_interface_frame/camera_platform_interface_frame.dart';
 
 /// Converts method channel call [data] for `receivedImageStreamData` to a
 /// [CameraImageData].
@@ -24,6 +24,26 @@ CameraImageData cameraImageFromPlatformData(Map<dynamic, dynamic> data) {
       ),
     ),
   );
+}
+
+Map<String, dynamic> imageDataToPlatformData(CameraImageData imageData) {
+  return {
+    'format': imageData.format.raw,
+    'height': imageData.height,
+    'width': imageData.width,
+    'lensAperture': imageData.lensAperture,
+    'sensorExposureTime': imageData.sensorExposureTime,
+    'sensorSensitivity': imageData.sensorSensitivity,
+    'planes': imageData.planes
+        .map((CameraImagePlane plane) => {
+              'bytes': plane.bytes,
+              'bytesPerRow': plane.bytesPerRow,
+              'bytesPerPixel': plane.bytesPerPixel,
+              'height': plane.height,
+              'width': plane.width,
+            })
+        .toList(),
+  };
 }
 
 CameraImageFormat _cameraImageFormatFromPlatformData(dynamic data) {
