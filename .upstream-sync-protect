@@ -1,0 +1,11 @@
+.git
+.github
+.gitignore
+.DS_Store
+.upstream-sync-exclude
+.upstream-sync-protect
+sync_upstream.sh
+.upstream_tmp
+.upstream_tmp/**
+.dart_tool/**
+build/**
