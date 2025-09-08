@@ -4,10 +4,18 @@
 
 set -euo pipefail
 
+# ====== PRESET: ios | android ======
+PRESET="${PRESET:-android}"                     # <--- switch target here
+
 UPSTREAM_URL="${UPSTREAM_URL:-https://github.com/flutter/packages.git}"
 UPSTREAM_BRANCH="${UPSTREAM_BRANCH:-main}"
 
-UPSTREAM_SUBPATH="${UPSTREAM_SUBPATH:-packages/camera/camera_android}"
+# Defaults based on PRESET
+if [ "$PRESET" = "android" ]; then
+  UPSTREAM_SUBPATH="${UPSTREAM_SUBPATH:-packages/camera/camera_android}"
+else
+  UPSTREAM_SUBPATH="${UPSTREAM_SUBPATH:-packages/camera/camera_avfoundation}"
+fi
 
 TARGET_BRANCH="${TARGET_BRANCH:-upstream-sync}"          # branch to place clean upstream
 FEATURE_BASE="${FEATURE_BASE:-origin/main}"              # where your features live
@@ -50,10 +58,17 @@ for p in \
 ; do append_unique "$EXCLUDE_FILE" "$p"; done
 
 # Platform-specific excludes
+if [ "$PRESET" = "android" ]; then
   for p in \
     ".idea/**" "*.iml" ".gradle/**" \
     "android/local.properties" \
     "android/**/build/**" "**/generated/**" \
+  ; do append_unique "$EXCLUDE_FILE" "$p"; done
+else
+  for p in \
+    "ios/camera_avfoundation.podspec" \
+    "ios/camera_avfoundation/Sources/camera_avfoundation_objc/messages.g.m" \
+    "**/*.g.h" "**/*.g.m" "**/*.g.mm" \
   ; do append_unique "$EXCLUDE_FILE" "$p"; done
 fi
 
@@ -77,6 +92,7 @@ fi
 TMP_DIR="$(mktemp -d -t upstream_camera_sync_XXXXXX)"
 trap 'rm -rf "$TMP_DIR" 2>/dev/null || true' EXIT
 
+echo "==> PRESET: $PRESET"
 echo "==> Upstream: $UPSTREAM_URL [$UPSTREAM_BRANCH] :: $UPSTREAM_SUBPATH"
 echo "==> Temp dir: $TMP_DIR"
 echo "==> Target branch: $TARGET_BRANCH"
@@ -127,11 +143,19 @@ git checkout -b "$REAPPLY_BRANCH" "$TARGET_BRANCH"
 
 PATCH_FILE="$(mktemp -t reapply_patch_XXXXXX.diff)"
 
+# Patch paths differ per preset
+if [ "$PRESET" = "android" ]; then
   INCLUDE_PATHS=(
     'android/**'
     'lib/**'
     'include/**'
   )
+else
+    INCLUDE_PATHS=(
+      'ios/**'
+      'lib/**'
+      'include/**'
+    )
 fi
 
 # Build git diff command
@@ -159,6 +183,7 @@ else
   set -e
   git add -A
   if ! git diff --cached --quiet; then
+    git commit -m "feat: reapply custom features on top of upstream ($PRESET)"
     echo "==> Reapply commit created on $REAPPLY_BRANCH"
   else
     echo "==> Nothing to commit after reapply."
@@ -174,10 +199,12 @@ if [ "$AUTO_PUSH" = "1" ]; then
   git push -u "$REMOTE_NAME" "$TARGET_BRANCH"
   git push -u "$REMOTE_NAME" "$REAPPLY_BRANCH"
   echo "Open PRs:"
+  echo "  1) $TARGET_BRANCH → main   (clean upstream: $PRESET)"
   echo "  2) $REAPPLY_BRANCH → $TARGET_BRANCH  (your features)"
 else
   echo "==> Done. Push branches and open PRs:"
   echo "   git push -u $REMOTE_NAME $TARGET_BRANCH"
   echo "   git push -u $REMOTE_NAME $REAPPLY_BRANCH"
+  echo "   PR #1: $TARGET_BRANCH → main   (upstream $PRESET only)"
   echo "   PR #2: $REAPPLY_BRANCH → $TARGET_BRANCH  (reapply features)"
 fi
