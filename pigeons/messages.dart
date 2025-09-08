@@ -1,48 +1,73 @@
 // Copyright 2013 The Flutter Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
+
 import 'package:pigeon/pigeon.dart';
 
 @ConfigurePigeon(
   PigeonOptions(
     dartOut: 'lib/src/messages.g.dart',
-    javaOptions: JavaOptions(package: 'io.flutter.plugins.camera'),
-    javaOut: 'android/src/main/java/io/flutter/plugins/camera/Messages.java',
+    objcHeaderOut:
+        'ios/camera_avfoundation/Sources/camera_avfoundation_objc/include/camera_avfoundation/messages.g.h',
+    objcSourceOut:
+        'ios/camera_avfoundation/Sources/camera_avfoundation_objc/messages.g.m',
+    objcOptions: ObjcOptions(
+      prefix: 'FCP',
+      headerIncludePath: './include/camera_avfoundation/messages.g.h',
+    ),
     copyrightHeader: 'pigeons/copyright.txt',
   ),
 )
+// Pigeon version of CameraLensDirection.
+enum PlatformCameraLensDirection {
+  /// Front facing camera (a user looking at the screen is seen by the camera).
+  front,
 
-/// Pigeon equivalent of [CameraLensDirection].
-enum PlatformCameraLensDirection { front, back, external }
+  /// Back facing camera (a user looking at the screen is not seen by the camera).
+  back,
 
-/// Pigeon equivalent of [CameraDescription].
-class PlatformCameraDescription {
-  PlatformCameraDescription({
-    required this.name,
-    required this.lensDirection,
-    required this.sensorOrientation,
-  });
-
-  final String name;
-  final PlatformCameraLensDirection lensDirection;
-  final int sensorOrientation;
+  /// External camera which may not be mounted to the device.
+  external,
 }
 
-/// Pigeon equivalent of [DeviceOrientation].
+// Pigeon version of DeviceOrientation.
 enum PlatformDeviceOrientation {
   portraitUp,
-  portraitDown,
   landscapeLeft,
+  portraitDown,
   landscapeRight,
 }
 
-/// Pigeon equivalent of [ExposureMode].
+// Pigeon version of ExposureMode.
 enum PlatformExposureMode { auto, locked }
 
-/// Pigeon equivalent of [FocusMode].
+// Pigeon version of FlashMode.
+enum PlatformFlashMode { off, auto, always, torch }
+
+// Pigeon version of FocusMode.
 enum PlatformFocusMode { auto, locked }
 
-/// Data needed for [CameraInitializedEvent].
+/// Pigeon version of ImageFileFormat.
+enum PlatformImageFileFormat { jpeg, heif }
+
+// Pigeon version of the subset of ImageFormatGroup supported on iOS.
+enum PlatformImageFormatGroup { bgra8888, yuv420 }
+
+// Pigeon version of ResolutionPreset.
+enum PlatformResolutionPreset { low, medium, high, veryHigh, ultraHigh, max }
+
+// Pigeon version of CameraDescription.
+class PlatformCameraDescription {
+  PlatformCameraDescription({required this.name, required this.lensDirection});
+
+  /// The name of the camera device.
+  final String name;
+
+  /// The direction the camera is facing.
+  final PlatformCameraLensDirection lensDirection;
+}
+
+// Pigeon version of the data needed for a CameraInitializedEvent.
 class PlatformCameraState {
   PlatformCameraState({
     required this.previewSize,
@@ -52,22 +77,40 @@ class PlatformCameraState {
     required this.focusPointSupported,
   });
 
+  /// The size of the preview, in pixels.
   final PlatformSize previewSize;
+
+  /// The default exposure mode
   final PlatformExposureMode exposureMode;
+
+  /// The default focus mode
   final PlatformFocusMode focusMode;
+
+  /// Whether setting exposure points is supported.
   final bool exposurePointSupported;
+
+  /// Whether setting focus points is supported.
   final bool focusPointSupported;
 }
 
-/// Pigeon equivalent of [Size].
-class PlatformSize {
-  PlatformSize({required this.width, required this.height});
+// Pigeon version of to MediaSettings.
+class PlatformMediaSettings {
+  PlatformMediaSettings({
+    required this.resolutionPreset,
+    required this.framesPerSecond,
+    required this.videoBitrate,
+    required this.audioBitrate,
+    required this.enableAudio,
+  });
 
-  final double width;
-  final double height;
+  final PlatformResolutionPreset resolutionPreset;
+  final int? framesPerSecond;
+  final int? videoBitrate;
+  final int? audioBitrate;
+  final bool enableAudio;
 }
 
-/// Pigeon equivalent of [Point].
+// Pigeon equivalent of CGPoint.
 class PlatformPoint {
   PlatformPoint({required this.x, required this.y});
 
@@ -75,157 +118,191 @@ class PlatformPoint {
   final double y;
 }
 
-/// Pigeon equivalent of [ResolutionPreset].
-enum PlatformResolutionPreset { low, medium, high, veryHigh, ultraHigh, max }
+// Pigeon equivalent of CGSize.
+class PlatformSize {
+  PlatformSize({required this.width, required this.height});
 
-/// Pigeon equivalent of [MediaSettings].
-class PlatformMediaSettings {
-  PlatformMediaSettings({
-    required this.resolutionPreset,
-    required this.enableAudio,
-    this.fps,
-    this.videoBitrate,
-    this.audioBitrate,
-  });
-  final PlatformResolutionPreset resolutionPreset;
-  final int? fps;
-  final int? videoBitrate;
-  final int? audioBitrate;
-  final bool enableAudio;
+  final double width;
+  final double height;
 }
 
-/// Pigeon equivalent of [ImageFormatGroup].
-enum PlatformImageFormatGroup {
-  /// The default for Android.
-  yuv420,
-  jpeg,
-  nv21,
-}
-
-/// Pigeon equivalent of [FlashMode].
-enum PlatformFlashMode { off, auto, always, torch }
-
-/// Handles calls from Dart to the native side.
 @HostApi()
 abstract class CameraApi {
   /// Returns the list of available cameras.
+  // TODO(stuartmorgan): Make the generic type non-nullable once supported.
+  // https://github.com/flutter/flutter/issues/97848
+  // The consuming code treats it as non-nullable.
+  @async
+  @ObjCSelector('availableCamerasWithCompletion')
   List<PlatformCameraDescription> getAvailableCameras();
 
-  /// Creates a new camera with the given name and settings and returns its ID.
+  /// Create a new camera with the given settings, and returns its ID.
   @async
-  int create(String cameraName, PlatformMediaSettings mediaSettings);
+  @ObjCSelector('createCameraWithName:settings:')
+  int create(String cameraName, PlatformMediaSettings settings);
 
-  /// Initializes the camera with the given ID for the given image format.
-  void initialize(PlatformImageFormatGroup imageFormat);
+  /// Initializes the camera with the given ID.
+  @async
+  @ObjCSelector('initializeCamera:withImageFormat:')
+  void initialize(int cameraId, PlatformImageFormatGroup imageFormat);
 
-  /// Disposes of the camera with the given ID.
-  void dispose();
+  /// Begins streaming frames from the camera.
+  @async
+  void startImageStream();
 
-  /// Locks the camera with the given ID to the given orientation.
+  /// Stops streaming frames from the camera.
+  @async
+  void stopImageStream();
+
+  /// Called by the Dart side of the plugin when it has received the last image
+  /// frame sent.
+  ///
+  /// This is used to throttle sending frames across the channel.
+  @async
+  void receivedImageStreamData();
+
+  /// Indicates that the given camera is no longer being used on the Dart side,
+  /// and any associated resources can be cleaned up.
+  @async
+  @ObjCSelector('disposeCamera:')
+  void dispose(int cameraId);
+
+  /// Locks the camera capture to the current device orientation.
+  @async
+  @ObjCSelector('lockCaptureOrientation:')
   void lockCaptureOrientation(PlatformDeviceOrientation orientation);
 
-  /// Unlocks the orientation for the camera with the given ID.
+  /// Unlocks camera capture orientation, allowing it to automatically adapt to
+  /// device orientation.
+  @async
   void unlockCaptureOrientation();
 
-  /// Takes a picture on the camera with the given ID and returns a path to the
+  /// Takes a picture with the current settings, and returns the path to the
   /// resulting file.
   @async
   String takePicture();
 
-  /// Starts recording a video on the camera with the given ID.
+  /// Does any preprocessing necessary before beginning to record video.
+  @async
+  void prepareForVideoRecording();
+
+  /// Begins recording video, optionally enabling streaming to Dart at the same
+  /// time.
+  @async
+  @ObjCSelector('startVideoRecordingWithStreaming:')
   void startVideoRecording(bool enableStream);
 
-  /// Ends video recording on the camera with the given ID and returns the path
-  /// to the resulting file.
+  /// Stops recording video, and results the path to the resulting file.
+  @async
   String stopVideoRecording();
 
-  /// Pauses video recording on the camera with the given ID.
+  /// Pauses video recording.
+  @async
   void pauseVideoRecording();
 
-  /// Resumes previously paused video recording on the camera with the given ID.
+  /// Resumes a previously paused video recording.
+  @async
   void resumeVideoRecording();
 
-  /// Begins streaming frames from the camera.
-  void startImageStream();
-
-  /// Stops streaming frames from the camera.
-  void stopImageStream();
-
-  /// Sets the flash mode of the camera with the given ID.
+  /// Switches the camera to the given flash mode.
   @async
-  void setFlashMode(PlatformFlashMode flashMode);
+  @ObjCSelector('setFlashMode:')
+  void setFlashMode(PlatformFlashMode mode);
 
-  /// Sets the exposure mode of the camera with the given ID.
+  /// Switches the camera to the given exposure mode.
   @async
-  void setExposureMode(PlatformExposureMode exposureMode);
+  @ObjCSelector('setExposureMode:')
+  void setExposureMode(PlatformExposureMode mode);
 
-  /// Sets the exposure point of the camera with the given ID.
+  /// Anchors auto-exposure to the given point in (0,1) coordinate space.
   ///
   /// A null value resets to the default exposure point.
   @async
+  @ObjCSelector('setExposurePoint:')
   void setExposurePoint(PlatformPoint? point);
 
-  /// Returns the minimum exposure offset of the camera with the given ID.
+  /// Returns the minimum exposure offset supported by the camera.
+  @async
+  @ObjCSelector('getMinimumExposureOffset')
   double getMinExposureOffset();
 
-  /// Returns the maximum exposure offset of the camera with the given ID.
+  /// Returns the maximum exposure offset supported by the camera.
+  @async
+  @ObjCSelector('getMaximumExposureOffset')
   double getMaxExposureOffset();
 
-  /// Returns the exposure step size of the camera with the given ID.
-  double getExposureOffsetStepSize();
-
-  /// Sets the exposure offset of the camera with the given ID and returns the
-  /// actual exposure offset.
+  /// Sets the exposure offset manually to the given value.
   @async
-  double setExposureOffset(double offset);
+  @ObjCSelector('setExposureOffset:')
+  void setExposureOffset(double offset);
 
-  /// Sets the focus mode of the camera with the given ID.
-  void setFocusMode(PlatformFocusMode focusMode);
+  /// Switches the camera to the given focus mode.
+  @async
+  @ObjCSelector('setFocusMode:')
+  void setFocusMode(PlatformFocusMode mode);
 
-  /// Sets the focus point of the camera with the given ID.
+  /// Anchors auto-focus to the given point in (0,1) coordinate space.
   ///
   /// A null value resets to the default focus point.
   @async
+  @ObjCSelector('setFocusPoint:')
   void setFocusPoint(PlatformPoint? point);
 
-  /// Returns the maximum zoom level of the camera with the given ID.
-  double getMaxZoomLevel();
-
-  /// Returns the minimum zoom level of the camera with the given ID.
+  /// Returns the minimum zoom level supported by the camera.
+  @async
+  @ObjCSelector('getMinimumZoomLevel')
   double getMinZoomLevel();
 
-  /// Sets the zoom level of the camera with the given ID.
+  /// Returns the maximum zoom level supported by the camera.
   @async
+  @ObjCSelector('getMaximumZoomLevel')
+  double getMaxZoomLevel();
+
+  /// Sets the zoom factor.
+  @async
+  @ObjCSelector('setZoomLevel:')
   void setZoomLevel(double zoom);
 
   /// Pauses streaming of preview frames.
+  @async
   void pausePreview();
 
-  /// Resumes previously paused streaming of preview frames.
+  /// Resumes a previously paused preview stream.
+  @async
   void resumePreview();
 
-  /// Changes the camera while recording video.
+  /// Changes the camera used while recording video.
   ///
-  /// This should be called only while video recording is active.
-  void setDescriptionWhileRecording(String description);
+  /// This should only be called while video recording is active.
+  @async
+  void updateDescriptionWhileRecording(String cameraName);
+
+  /// Sets the file format used for taking pictures.
+  @async
+  @ObjCSelector('setImageFileFormat:')
+  void setImageFileFormat(PlatformImageFileFormat format);
 }
 
-/// Handles calls from native side to Dart that are not camera-specific.
+/// Handler for native callbacks that are not tied to a specific camera ID.
 @FlutterApi()
 abstract class CameraGlobalEventApi {
   /// Called when the device's physical orientation changes.
   void deviceOrientationChanged(PlatformDeviceOrientation orientation);
 }
 
-/// Handles device-specific calls from native side to Dart.
+/// Handler for native callbacks that are tied to a specific camera ID.
+///
+/// This is intended to be initialized with the camera ID as a suffix.
 @FlutterApi()
 abstract class CameraEventApi {
-  /// Called when the camera is initialized.
+  /// Called when the camera is inialitized for use.
+  @ObjCSelector('initializedWithState:')
   void initialized(PlatformCameraState initialState);
 
   /// Called when an error occurs in the camera.
+  ///
+  /// This should be used for errors that occur outside of the context of
+  /// handling a specific HostApi call, such as during streaming.
+  @ObjCSelector('reportError:')
   void error(String message);
-
-  /// Called when the camera closes.
-  void closed();
 }

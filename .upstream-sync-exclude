@@ -22,3 +22,8 @@ build/**
 android/local.properties
 android/**/build/**
 **/generated/**
+ios/camera_avfoundation.podspec
+ios/camera_avfoundation/Sources/camera_avfoundation_objc/messages.g.m
+**/*.g.h
+**/*.g.m
+**/*.g.mm
