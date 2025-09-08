@@ -1,6 +1,6 @@
 # camera\_android\_frame
 
-The iOS implementation of [`camera_frame`][1].
+The Android implementation of [`camera_frame`][1].
 
 ## Usage
 
