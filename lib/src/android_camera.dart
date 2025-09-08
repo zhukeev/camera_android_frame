@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:camera_platform_interface_frame/camera_platform_interface_frame.dart';
+import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:stream_transform/stream_transform.dart';
@@ -18,7 +18,7 @@ import 'utils.dart';
 class AndroidCamera extends CameraPlatform {
   /// Creates a new [CameraPlatform] instance.
   AndroidCamera({@visibleForTesting CameraApi? hostApi})
-      : _hostApi = hostApi ?? CameraApi();
+    : _hostApi = hostApi ?? CameraApi();
 
   /// Registers this class as the default instance of [CameraPlatform].
   static void registerWith() {
@@ -60,15 +60,9 @@ class AndroidCamera extends CameraPlatform {
   // The stream for vending frames to platform interface clients.
   StreamController<CameraImageData>? _frameStreamController;
 
-  Stream<CameraEvent> _cameraEvents(int cameraId) =>
-      cameraEventStreamController.stream
-          .where((CameraEvent event) => event.cameraId == cameraId);
-
-  // The stream to receive frames from the native code.
-  StreamSubscription<dynamic>? _platformFramesStreamSubscription;
-
-  // The stream for vending frames to platform interface clients.
-  StreamController<CameraImageData>? _framesStreamController;
+  Stream<CameraEvent> _cameraEvents(int cameraId) => cameraEventStreamController
+      .stream
+      .where((CameraEvent event) => event.cameraId == cameraId);
 
   @override
   Future<List<CameraDescription>> availableCameras() async {
@@ -96,12 +90,10 @@ class AndroidCamera extends CameraPlatform {
     CameraDescription cameraDescription,
     ResolutionPreset? resolutionPreset, {
     bool enableAudio = false,
-  }) =>
-      createCameraWithSettings(
-        cameraDescription,
-        MediaSettings(
-            resolutionPreset: resolutionPreset, enableAudio: enableAudio),
-      );
+  }) => createCameraWithSettings(
+    cameraDescription,
+    MediaSettings(resolutionPreset: resolutionPreset, enableAudio: enableAudio),
+  );
 
   @override
   Future<int> createCameraWithSettings(
@@ -207,44 +199,6 @@ class AndroidCamera extends CameraPlatform {
     return XFile(path);
   }
 
-  @override
-  Future<CameraImageData> capturePreviewFrame() async {
-    final imageData = await _hostApi.capturePreviewFrame();
-    return cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>);
-  }
-
-  @override
-  Future<XFile> saveAsJpeg(CameraImageData imageData, String outputPath,
-      int rotation, int quality) async {
-    final filePath = await _hostApi.saveAsJpeg(
-        imageDataToPlatformData(imageData).cast<String, Object>(),
-        outputPath,
-        rotation,
-        quality);
-    return XFile(filePath);
-  }
-
-  @override
-  Future<XFile> capturePreviewFrameJpeg(String outputPath,
-      [int rotation = 0, int quality = 100]) async {
-    final path =
-        await _hostApi.capturePreviewFrameJpeg(outputPath, rotation, quality);
-    return XFile(path);
-  }
-
-  @override
-  Future<void> startListenFrames(
-      {void Function(CameraImageData image)? frameCallback}) async {
-    await _hostApi.startListenFrames();
-    _startFramesStreamListener();
-    _installFramesStreamController().stream.listen(frameCallback);
-  }
-
-  @override
-  Future<void> stopListenFrames() {
-    return _hostApi.stopListenFrames();
-  }
-
   // This optimization is unnecessary on Android.
   @override
   Future<void> prepareForVideoRecording() async {}
@@ -306,17 +260,6 @@ class AndroidCamera extends CameraPlatform {
     return _frameStreamController!;
   }
 
-  StreamController<CameraImageData> _installFramesStreamController(
-      {void Function()? onListen}) {
-    _framesStreamController = StreamController<CameraImageData>(
-      onListen: onListen ?? () {},
-      onPause: _onFramesStreamPauseResume,
-      onResume: _onFramesStreamPauseResume,
-      onCancel: _onFramesStreamCancel,
-    );
-    return _framesStreamController!;
-  }
-
   void _onFrameStreamListen() {
     _startPlatformStream();
   }
@@ -330,21 +273,13 @@ class AndroidCamera extends CameraPlatform {
     const EventChannel cameraEventChannel = EventChannel(
       'plugins.flutter.io/camera_android/imageStream',
     );
-    _platformImageStreamSubscription =
-        cameraEventChannel.receiveBroadcastStream().listen((dynamic imageData) {
-      _frameStreamController!
-          .add(cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>));
-    });
-  }
-
-  void _startFramesStreamListener() {
-    const EventChannel framesEventChannel =
-        EventChannel('plugins.flutter.io/camera_android/framesStream');
-    _platformImageStreamSubscription =
-        framesEventChannel.receiveBroadcastStream().listen((dynamic imageData) {
-      _framesStreamController!
-          .add(cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>));
-    });
+    _platformImageStreamSubscription = cameraEventChannel
+        .receiveBroadcastStream()
+        .listen((dynamic imageData) {
+          _frameStreamController!.add(
+            cameraImageFromPlatformData(imageData as Map<dynamic, dynamic>),
+          );
+        });
   }
 
   FutureOr<void> _onFrameStreamCancel() async {
@@ -354,21 +289,7 @@ class AndroidCamera extends CameraPlatform {
     _frameStreamController = null;
   }
 
-  FutureOr<void> _onFramesStreamCancel() async {
-    await _hostApi.stopListenFrames();
-    await _platformFramesStreamSubscription?.cancel();
-    _platformFramesStreamSubscription = null;
-    _framesStreamController = null;
-  }
-
   void _onFrameStreamPauseResume() {
-    throw CameraException(
-      'InvalidCall',
-      'Pause and resume are not supported for onStreamedFrameAvailable',
-    );
-  }
-
-  void _onFramesStreamPauseResume() {
     throw CameraException(
       'InvalidCall',
       'Pause and resume are not supported for onStreamedFrameAvailable',
