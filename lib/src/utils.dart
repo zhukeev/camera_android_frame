@@ -114,6 +114,7 @@ PlatformMediaSettings mediaSettingsToPlatform(MediaSettings? settings) =>
       videoBitrate: settings?.videoBitrate,
       audioBitrate: settings?.audioBitrate,
       fps: settings?.fps,
+      frameFps: settings?.frameFps,
     );
 
 /// Converts an [ImageFormatGroup] to [PlatformImageFormatGroup].

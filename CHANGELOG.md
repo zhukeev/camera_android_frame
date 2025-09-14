@@ -1,3 +1,7 @@
+## 0.10.21
+
+- support `frameFps`
+
 ## 0.10.20
 
 - updated camera_platform_interface_frame to 2.10.10

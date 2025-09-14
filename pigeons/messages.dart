@@ -84,11 +84,13 @@ class PlatformMediaSettings {
     required this.resolutionPreset,
     required this.enableAudio,
     this.fps,
+    this.frameFps,
     this.videoBitrate,
     this.audioBitrate,
   });
   final PlatformResolutionPreset resolutionPreset;
   final int? fps;
+  final int? frameFps;
   final int? videoBitrate;
   final int? audioBitrate;
   final bool enableAudio;
@@ -131,6 +133,25 @@ abstract class CameraApi {
   /// resulting file.
   @async
   String takePicture();
+
+  /// Capture a preview frame and return it as a map
+  @async
+  Map<String, Object> capturePreviewFrame();
+
+  /// Capture a preview frame and return it as a jpeg
+  @async
+  String capturePreviewFrameJpeg(String outputPath, int rotation, int quality);
+
+  /// Save a preview frame to the given path.
+  @async
+  String saveAsJpeg(Map<String, Object> imageData, String outputPath,
+      int rotation, int quality);
+
+  /// Start listening for preview frames
+  void startListenFrames();
+
+  /// Stop listening for preview frames
+  void stopListenFrames();
 
   /// Starts recording a video on the camera with the given ID.
   void startVideoRecording(bool enableStream);

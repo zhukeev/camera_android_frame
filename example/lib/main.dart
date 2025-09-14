@@ -641,6 +641,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       ResolutionPreset.medium,
       enableAudio: enableAudio,
       imageFormatGroup: ImageFormatGroup.nv21,
+      frameFps: 2,
     );
 
     controller = cameraController;

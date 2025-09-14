@@ -76,3 +76,6 @@ Thumbs.db
 
 # ─── Dart Analysis Cache ─────────────────────────────────
 analysis_options.yaml
+
+# FVM Version Cache
+.fvm/

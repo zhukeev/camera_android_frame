@@ -70,6 +70,7 @@ final class CameraApiImpl implements Messages.CameraApi {
     CameraProperties cameraProperties =
         new CameraPropertiesImpl(cameraName, CameraUtils.getCameraManager(activity));
     Integer fps = (settings.getFps() == null) ? null : settings.getFps().intValue();
+    Integer frameFps = (settings.getFrameFps() == null) ? null : settings.getFrameFps().intValue();
     Integer videoBitrate =
         (settings.getVideoBitrate() == null) ? null : settings.getVideoBitrate().intValue();
     Integer audioBitrate =
@@ -85,7 +86,7 @@ final class CameraApiImpl implements Messages.CameraApi {
             dartMessenger,
             cameraProperties,
             new Camera.VideoCaptureSettings(
-                resolutionPreset, settings.getEnableAudio(), fps, videoBitrate, audioBitrate));
+                resolutionPreset, settings.getEnableAudio(), fps,frameFps, videoBitrate, audioBitrate));
 
     return flutterSurfaceTexture.id();
   }

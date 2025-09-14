@@ -45,6 +45,17 @@ public final class LastFrameStore {
     private static final long DEFAULT_MIN_INTERVAL_NS = 200_000_000L;
     private long lastAcceptTsNs = 0L;
 
+    private long defaultMinIntervalNs = DEFAULT_MIN_INTERVAL_NS;
+
+    public void setFrameFps(@Nullable Integer fps) {
+        if (fps != null && fps > 0) {
+            defaultMinIntervalNs = 1_000_000_000L / fps;
+        } else {
+            defaultMinIntervalNs = 0L;
+        }
+        lastAcceptTsNs = 0L;
+    }
+
     // Optional listener for streaming
     @Nullable private volatile OnFrameListener onFrameListener;
     private volatile boolean copyBytesForCallback = true;
@@ -61,7 +72,7 @@ public final class LastFrameStore {
     }
 
     /** Accept with default throttling. Image is ALWAYS closed. */
-    public void accept(Image image) { accept(image, DEFAULT_MIN_INTERVAL_NS); }
+    public void accept(Image image) { accept(image, defaultMinIntervalNs); }
 
     /**
      * Accept a YUV_420_888 Image and convert to NV21 into ring buffer.

@@ -13,8 +13,11 @@ import android.content.Context;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+
 import androidx.exifinterface.media.ExifInterface;
+
 import java.util.concurrent.atomic.AtomicLong;
+
 import android.os.SystemClock;
 
 import android.graphics.YuvImage;
@@ -171,14 +174,18 @@ class Camera
     private final LastFrameStore lastFrameStore = new LastFrameStore();
 
     private final Object jpegScratchLock = new Object();
-    @Nullable private byte[] scratchNv21;
-    @Nullable private byte[] scratchNv21Rot;
+    @Nullable
+    private byte[] scratchNv21;
+    @Nullable
+    private byte[] scratchNv21Rot;
 
-    private static int nv21Size(int w, int h) { return (w * h * 3) / 2; }
+    private static int nv21Size(int w, int h) {
+        return (w * h * 3) / 2;
+    }
 
     private byte[] ensureNv21Scratch(@Nullable byte[] cur, int need) {
-    if (cur == null || cur.length < need) return new byte[need];
-    return cur;
+        if (cur == null || cur.length < need) return new byte[need];
+        return cur;
     }
 
     /**
@@ -255,6 +262,8 @@ class Camera
         public final ResolutionPreset resolutionPreset;
         public final boolean enableAudio;
         @Nullable
+        public final Integer frameFps;
+        @Nullable
         public final Integer fps;
         @Nullable
         public final Integer videoBitrate;
@@ -265,17 +274,19 @@ class Camera
                 @NonNull ResolutionPreset resolutionPreset,
                 boolean enableAudio,
                 @Nullable Integer fps,
+                @Nullable Integer frameFps,
                 @Nullable Integer videoBitrate,
                 @Nullable Integer audioBitrate) {
             this.resolutionPreset = resolutionPreset;
             this.enableAudio = enableAudio;
+            this.frameFps = frameFps;
             this.fps = fps;
             this.videoBitrate = videoBitrate;
             this.audioBitrate = audioBitrate;
         }
 
         public VideoCaptureSettings(@NonNull ResolutionPreset resolutionPreset, boolean enableAudio) {
-            this(resolutionPreset, enableAudio, null, null, null);
+            this(resolutionPreset, enableAudio, null, null, null, null);
         }
     }
 
@@ -412,7 +423,7 @@ class Camera
         }
     }
 
-    @SuppressLint({ "MissingPermission", "VisibleForTests" })
+    @SuppressLint({"MissingPermission", "VisibleForTests"})
     public void open(Integer imageFormatGroup) throws CameraAccessException {
         this.imageFormatGroup = imageFormatGroup;
         final ResolutionFeature resolutionFeature = cameraFeatures.getResolution();
@@ -446,6 +457,8 @@ class Camera
                 resolutionFeature.getPreviewSize().getHeight(),
                 ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
                 4);
+
+        lastFrameStore.setFrameFps(videoCaptureSettings.frameFps);
         frameStreamReader.setOnImageAvailableListener(reader -> {
             Image image = null;
             try {
@@ -480,12 +493,12 @@ class Camera
                             Runnable onSuccess = recordingVideo
                                     ? null
                                     : () -> dartMessenger.sendCameraInitializedEvent(
-                                            resolutionFeature.getPreviewSize().getWidth(),
-                                            resolutionFeature.getPreviewSize().getHeight(),
-                                            cameraFeatures.getExposureLock().getValue(),
-                                            cameraFeatures.getAutoFocus().getValue(),
-                                            cameraFeatures.getExposurePoint().checkIsSupported(),
-                                            cameraFeatures.getFocusPoint().checkIsSupported());
+                                    resolutionFeature.getPreviewSize().getWidth(),
+                                    resolutionFeature.getPreviewSize().getHeight(),
+                                    cameraFeatures.getExposureLock().getValue(),
+                                    cameraFeatures.getAutoFocus().getValue(),
+                                    cameraFeatures.getExposurePoint().checkIsSupported(),
+                                    cameraFeatures.getFocusPoint().checkIsSupported());
                             startPreview(onSuccess);
                         } catch (Exception e) {
                             String message = (e.getMessage() == null)
@@ -753,7 +766,7 @@ class Camera
     }
 
     private void saveJpegFromNV21(byte[] nv21, int width, int height,
-            String outputPath, int rotationDegrees, int quality) throws IOException {
+                                  String outputPath, int rotationDegrees, int quality) throws IOException {
         if (rotationDegrees == 0) {
             YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
             try (FileOutputStream fos = new FileOutputStream(outputPath)) {
@@ -768,7 +781,7 @@ class Camera
     }
 
     private void saveJpegFromNV21WithRotation(byte[] nv21, int width, int height,
-            String outputPath, int rotationDegrees, int quality) throws IOException {
+                                              String outputPath, int rotationDegrees, int quality) throws IOException {
         YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
         try (FileOutputStream fos = new FileOutputStream(outputPath)) {
             Rect rect = new Rect(0, 0, width, height);
@@ -781,81 +794,83 @@ class Camera
 
     @SuppressWarnings("unchecked")
     private byte[] convertYUV420ToNV21FromMap(Map<String, Object> imageData) {
-    final int width  = ((Number) imageData.get("width")).intValue();
-    final int height = ((Number) imageData.get("height")).intValue();
-    final int need   = nv21Size(width, height);
+        final int width = ((Number) imageData.get("width")).intValue();
+        final int height = ((Number) imageData.get("height")).intValue();
+        final int need = nv21Size(width, height);
 
-    final List<Map<String, Object>> planes = (List<Map<String, Object>>) imageData.get("planes");
+        final List<Map<String, Object>> planes = (List<Map<String, Object>>) imageData.get("planes");
 
-    // If NV21 already arrived as a single plane, just copy into our reusable buffer
-    if (planes.size() == 1) {
-        byte[] src = (byte[]) planes.get(0).get("bytes");
-        synchronized (jpegScratchLock) {
-        scratchNv21 = ensureNv21Scratch(scratchNv21, need);
-        System.arraycopy(src, 0, scratchNv21, 0, Math.min(src.length, need));
-        return scratchNv21;
-        }
-    }
-
-    if (planes.size() != 3 && planes.size() != 2) {
-        throw new IllegalArgumentException("Invalid YUV420 plane count: " + planes.size());
-    }
-
-    // --- Y plane ---
-    final byte[] yPlane     = (byte[]) planes.get(0).get("bytes");
-    final int    yRowStride = ((Number) planes.get(0).get("bytesPerRow")).intValue();
-
-    // --- U/V planes ---
-    final byte[] uPlane       = (byte[]) planes.get(1).get("bytes");
-    final int    uRowStride   = ((Number) planes.get(1).get("bytesPerRow")).intValue();
-    final int    uPixelStride = ((Number) planes.get(1).get("bytesPerPixel")).intValue();
-
-    final byte[] vPlane;
-    final int    vRowStride;
-    final int    vPixelStride;
-
-    final boolean threePlanes = planes.size() == 3;
-    if (threePlanes) {
-        vPlane       = (byte[]) planes.get(2).get("bytes");
-        vRowStride   = ((Number) planes.get(2).get("bytesPerRow")).intValue();
-        vPixelStride = ((Number) planes.get(2).get("bytesPerPixel")).intValue();
-    } else {
-        // Bi-planar case (NV12-like): UV interleaved inside U plane
-        vPlane = null; vRowStride = 0; vPixelStride = 0;
-    }
-
-    synchronized (jpegScratchLock) {
-        scratchNv21 = ensureNv21Scratch(scratchNv21, need);
-        final byte[] dst = scratchNv21;
-
-        // Copy Y (assumes the Y plane buffer is tightly packed by rowStride across height rows)
-        for (int row = 0; row < height; row++) {
-        System.arraycopy(yPlane, row * yRowStride, dst, row * width, width);
-        }
-
-        // Copy interleaved VU (NV21 layout)
-        final int uvHeight = height / 2;
-        final int uvWidth  = width  / 2;
-        int d = width * height; // start of UV area in NV21
-
-        for (int row = 0; row < uvHeight; row++) {
-        final int urow = row * uRowStride;
-        final int vrow = row * vRowStride;
-        for (int col = 0; col < uvWidth; col++) {
-            final int uIndex = urow + col * uPixelStride;
-            if (threePlanes) {
-            final int vIndex = vrow + col * vPixelStride;
-            dst[d++] = vPlane[vIndex]; // V
-            dst[d++] = uPlane[uIndex]; // U
-            } else {
-            // NV12 case: U,V,U,V,... inside uPlane
-            dst[d++] = uPlane[uIndex + 1]; // V
-            dst[d++] = uPlane[uIndex];     // U
+        // If NV21 already arrived as a single plane, just copy into our reusable buffer
+        if (planes.size() == 1) {
+            byte[] src = (byte[]) planes.get(0).get("bytes");
+            synchronized (jpegScratchLock) {
+                scratchNv21 = ensureNv21Scratch(scratchNv21, need);
+                System.arraycopy(src, 0, scratchNv21, 0, Math.min(src.length, need));
+                return scratchNv21;
             }
         }
+
+        if (planes.size() != 3 && planes.size() != 2) {
+            throw new IllegalArgumentException("Invalid YUV420 plane count: " + planes.size());
         }
-        return dst;
-    }
+
+        // --- Y plane ---
+        final byte[] yPlane = (byte[]) planes.get(0).get("bytes");
+        final int yRowStride = ((Number) planes.get(0).get("bytesPerRow")).intValue();
+
+        // --- U/V planes ---
+        final byte[] uPlane = (byte[]) planes.get(1).get("bytes");
+        final int uRowStride = ((Number) planes.get(1).get("bytesPerRow")).intValue();
+        final int uPixelStride = ((Number) planes.get(1).get("bytesPerPixel")).intValue();
+
+        final byte[] vPlane;
+        final int vRowStride;
+        final int vPixelStride;
+
+        final boolean threePlanes = planes.size() == 3;
+        if (threePlanes) {
+            vPlane = (byte[]) planes.get(2).get("bytes");
+            vRowStride = ((Number) planes.get(2).get("bytesPerRow")).intValue();
+            vPixelStride = ((Number) planes.get(2).get("bytesPerPixel")).intValue();
+        } else {
+            // Bi-planar case (NV12-like): UV interleaved inside U plane
+            vPlane = null;
+            vRowStride = 0;
+            vPixelStride = 0;
+        }
+
+        synchronized (jpegScratchLock) {
+            scratchNv21 = ensureNv21Scratch(scratchNv21, need);
+            final byte[] dst = scratchNv21;
+
+            // Copy Y (assumes the Y plane buffer is tightly packed by rowStride across height rows)
+            for (int row = 0; row < height; row++) {
+                System.arraycopy(yPlane, row * yRowStride, dst, row * width, width);
+            }
+
+            // Copy interleaved VU (NV21 layout)
+            final int uvHeight = height / 2;
+            final int uvWidth = width / 2;
+            int d = width * height; // start of UV area in NV21
+
+            for (int row = 0; row < uvHeight; row++) {
+                final int urow = row * uRowStride;
+                final int vrow = row * vRowStride;
+                for (int col = 0; col < uvWidth; col++) {
+                    final int uIndex = urow + col * uPixelStride;
+                    if (threePlanes) {
+                        final int vIndex = vrow + col * vPixelStride;
+                        dst[d++] = vPlane[vIndex]; // V
+                        dst[d++] = uPlane[uIndex]; // U
+                    } else {
+                        // NV12 case: U,V,U,V,... inside uPlane
+                        dst[d++] = uPlane[uIndex + 1]; // V
+                        dst[d++] = uPlane[uIndex];     // U
+                    }
+                }
+            }
+            return dst;
+        }
     }
 
 
@@ -869,7 +884,7 @@ class Camera
     }
 
     public void capturePreviewFrameJpeg(@NonNull String outputPath, int rotationDegrees, int quality,
-            @NonNull Messages.Result<String> result) {
+                                        @NonNull Messages.Result<String> result) {
         backgroundHandler.post(() -> {
             try {
                 if (!lastFrameStore.hasFrame()) {
@@ -886,65 +901,65 @@ class Camera
     }
 
     public void saveAsJpeg(
-        Map<String, Object> imageData,
-        String outputPath,
-        int rotationDegrees,
-        int quality,
-        Messages.Result<String> result
+            Map<String, Object> imageData,
+            String outputPath,
+            int rotationDegrees,
+            int quality,
+            Messages.Result<String> result
     ) {
-    backgroundHandler.post(() -> {
-        try {
-        final int width  = ((Number) imageData.get("width")).intValue();
-        final int height = ((Number) imageData.get("height")).intValue();
+        backgroundHandler.post(() -> {
+            try {
+                final int width = ((Number) imageData.get("width")).intValue();
+                final int height = ((Number) imageData.get("height")).intValue();
 
-        final byte[] srcNv21 = convertYUV420ToNV21FromMap(imageData);
+                final byte[] srcNv21 = convertYUV420ToNV21FromMap(imageData);
 
-        // No rotation → compress straight to JPEG
-        if ((rotationDegrees % 360) == 0) {
-            writeJpegFromNv21(srcNv21, width, height, outputPath, quality);
-            mainHandler.post(() -> result.success(outputPath));
-            return;
-        }
+                // No rotation → compress straight to JPEG
+                if ((rotationDegrees % 360) == 0) {
+                    writeJpegFromNv21(srcNv21, width, height, outputPath, quality);
+                    mainHandler.post(() -> result.success(outputPath));
+                    return;
+                }
 
-        // For safety, skip rotation for odd dimensions (YUV420 is 2x2 chroma)
-        if (((width | height) & 1) != 0) {
-            writeJpegFromNv21(srcNv21, width, height, outputPath, quality);
-            mainHandler.post(() -> result.success(outputPath));
-            return;
-        }
+                // For safety, skip rotation for odd dimensions (YUV420 is 2x2 chroma)
+                if (((width | height) & 1) != 0) {
+                    writeJpegFromNv21(srcNv21, width, height, outputPath, quality);
+                    mainHandler.post(() -> result.success(outputPath));
+                    return;
+                }
 
-        final boolean swap = (rotationDegrees % 180 != 0);
-        final int outW = swap ? height : width;
-        final int outH = swap ? width  : height;
-        final int outSize = nv21Size(outW, outH);
+                final boolean swap = (rotationDegrees % 180 != 0);
+                final int outW = swap ? height : width;
+                final int outH = swap ? width : height;
+                final int outSize = nv21Size(outW, outH);
 
-        synchronized (jpegScratchLock) {
-            scratchNv21Rot = ensureNv21Scratch(scratchNv21Rot, outSize);
-            // Uses FastYuv to rotate NV21 into the provided destination buffer
-            FastYuv.rotateNv21Into(srcNv21, width, height, rotationDegrees, scratchNv21Rot);
-            writeJpegFromNv21(scratchNv21Rot, outW, outH, outputPath, quality);
-        }
+                synchronized (jpegScratchLock) {
+                    scratchNv21Rot = ensureNv21Scratch(scratchNv21Rot, outSize);
+                    // Uses FastYuv to rotate NV21 into the provided destination buffer
+                    FastYuv.rotateNv21Into(srcNv21, width, height, rotationDegrees, scratchNv21Rot);
+                    writeJpegFromNv21(scratchNv21Rot, outW, outH, outputPath, quality);
+                }
 
-        mainHandler.post(() -> result.success(outputPath));
-        } catch (Throwable e) {
-        e.printStackTrace();
-        mainHandler.post(() -> result.error(new Messages.FlutterError(
-            "save_failed", e.getMessage() != null ? e.getMessage() : "error", null)));
-        }
-    });
+                mainHandler.post(() -> result.success(outputPath));
+            } catch (Throwable e) {
+                e.printStackTrace();
+                mainHandler.post(() -> result.error(new Messages.FlutterError(
+                        "save_failed", e.getMessage() != null ? e.getMessage() : "error", null)));
+            }
+        });
     }
 
 
 
     private void writeJpegFromNv21(byte[] nv21, int width, int height, String outputPath, int quality)
-        throws IOException {
-    // Clamp quality to [1..100] for safety.
-    final int q = Math.max(1, Math.min(100, quality));
-    YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
+            throws IOException {
+        // Clamp quality to [1..100] for safety.
+        final int q = Math.max(1, Math.min(100, quality));
+        YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
         try (FileOutputStream fos = new FileOutputStream(outputPath)) {
             android.graphics.Rect rect = new android.graphics.Rect(0, 0, width, height);
             if (!yuv.compressToJpeg(rect, q, fos)) {
-            throw new IOException("compressToJpeg failed");
+                throw new IOException("compressToJpeg failed");
             }
         }
     }
@@ -952,23 +967,23 @@ class Camera
     // Starts listening: store sink and send the latest frame once, keep stream open.
     public void startListenFrames(@NonNull EventChannel frameStreamChannel) {
 
-    lastFrameStore.setOnFrameListener(frameMap -> {
-        final EventChannel.EventSink sink = frameStreamSink;
-        if (sink == null) return;
-        // deliver on main thread
-        mainHandler.post(() -> sink.success(frameMap));
-    }, /*copyBytesForCallback=*/true);
+        lastFrameStore.setOnFrameListener(frameMap -> {
+            final EventChannel.EventSink sink = frameStreamSink;
+            if (sink == null) return;
+            // deliver on main thread
+            mainHandler.post(() -> sink.success(frameMap));
+        }, /*copyBytesForCallback=*/true);
 
-    frameStreamChannel.setStreamHandler(new EventChannel.StreamHandler() {
-        @Override
-        public void onListen(Object arguments, EventChannel.EventSink events) {
-        frameStreamSink = events;
-        }
+        frameStreamChannel.setStreamHandler(new EventChannel.StreamHandler() {
+            @Override
+            public void onListen(Object arguments, EventChannel.EventSink events) {
+                frameStreamSink = events;
+            }
 
-        @Override
-        public void onCancel(Object arguments) {
-        frameStreamSink = null;
-        }
+            @Override
+            public void onCancel(Object arguments) {
+                frameStreamSink = null;
+            }
         });
     }
 
