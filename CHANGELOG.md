@@ -1,3 +1,7 @@
+## 0.10.24
+
+- Performance optimizations 
+
 ## 0.10.23
 
 - Frame Picture quality 

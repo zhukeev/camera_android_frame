@@ -3,7 +3,7 @@ description: Android implementation of the camera plugin.
 repository: https://github.com/zhukeev/camera_android_frame
 issue_tracker: https://github.com/zhukeev/camera_android_frame/issues
 
-version: 0.10.23
+version: 0.10.24
 
 environment:
   sdk: ^3.6.0

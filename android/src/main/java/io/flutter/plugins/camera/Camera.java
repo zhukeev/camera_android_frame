@@ -614,7 +614,7 @@ class Camera
         // Prepare the callback.
         CameraCaptureSession.StateCallback callback = new CameraCaptureSession.StateCallback() {
             boolean captureSessionClosed = false;
-
+            boolean retriedWithoutUseCases = false;
             @Override
             public void onConfigured(@NonNull CameraCaptureSession session) {
                 Log.i(TAG, "CameraCaptureSession onConfigured");
@@ -628,6 +628,25 @@ class Camera
                 Log.i(TAG, "Updating builder settings");
                 updateBuilderSettings(previewRequestBuilder);
 
+                previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+                        CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                previewRequestBuilder.set(CaptureRequest.NOISE_REDUCTION_MODE,
+                        CaptureRequest.NOISE_REDUCTION_MODE_HIGH_QUALITY);
+                previewRequestBuilder.set(CaptureRequest.EDGE_MODE,
+                        CaptureRequest.EDGE_MODE_HIGH_QUALITY);
+                previewRequestBuilder.set(CaptureRequest.TONEMAP_MODE,
+                        CaptureRequest.TONEMAP_MODE_HIGH_QUALITY);
+                previewRequestBuilder.set(CaptureRequest.HOT_PIXEL_MODE,
+                        CaptureRequest.HOT_PIXEL_MODE_HIGH_QUALITY);
+                previewRequestBuilder.set(CaptureRequest.COLOR_CORRECTION_ABERRATION_MODE,
+                        CaptureRequest.COLOR_CORRECTION_ABERRATION_MODE_HIGH_QUALITY);
+                previewRequestBuilder.set(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE,
+                        CaptureRequest.CONTROL_AE_ANTIBANDING_MODE_AUTO);
+
+                        
+                previewRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,
+                        new Range<>(15, 30));
+
                 refreshPreviewCaptureSession(
                         onSuccessCallback, (code, message) -> dartMessenger.sendCameraErrorEvent(message));
             }
@@ -635,7 +654,23 @@ class Camera
             @Override
             public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                 Log.i(TAG, "CameraCaptureSession onConfigureFailed");
-                dartMessenger.sendCameraErrorEvent("Failed to configure camera session.");
+                if (retriedWithoutUseCases || !SdkCapabilityChecker.supportsSessionConfiguration()) {
+                    dartMessenger.sendCameraErrorEvent("Failed to configure camera session.");
+                    return;
+                }
+
+                try {
+                    retriedWithoutUseCases = true;
+
+                    List<OutputConfiguration> fallback = new ArrayList<>();
+                    fallback.add(new OutputConfiguration(flutterSurface));
+                    for (Surface s : remainingSurfaces) {
+                        fallback.add(new OutputConfiguration(s));
+                    }
+                    createCaptureSessionWithSessionConfig(fallback, this);
+                } catch (CameraAccessException e) {
+                    dartMessenger.sendCameraErrorEvent("Failed to reconfigure session: " + e.getMessage());
+                }
             }
 
             @Override
@@ -647,15 +682,15 @@ class Camera
 
         // Start the session.
         if (SdkCapabilityChecker.supportsSessionConfiguration()) {
-            // Collect all surfaces to render to.
             List<OutputConfiguration> configs = new ArrayList<>();
-            configs.add(new OutputConfiguration(flutterSurface));
-            for (Surface surface : remainingSurfaces) {
-                configs.add(new OutputConfiguration(surface));
+            OutputConfiguration prevCfg = new OutputConfiguration(flutterSurface);
+            configs.add(prevCfg);
+            for (Surface s : remainingSurfaces) {
+                configs.add(new OutputConfiguration(s));
             }
             createCaptureSessionWithSessionConfig(configs, callback);
         } else {
-            // Collect all surfaces to render to.
+            // старая ветка без SessionConfiguration
             List<Surface> surfaceList = new ArrayList<>();
             surfaceList.add(flutterSurface);
             surfaceList.addAll(remainingSurfaces);
@@ -667,10 +702,22 @@ class Camera
     private void createCaptureSessionWithSessionConfig(
             List<OutputConfiguration> outputConfigs, CameraCaptureSession.StateCallback callback)
             throws CameraAccessException {
+
+                 List<OutputConfiguration> configs = new ArrayList<>();
+    OutputConfiguration prevOut = new OutputConfiguration(
+            new Surface(flutterTexture.surfaceTexture()));
+   
+            
+    configs.add(prevOut);
+
+    if (frameStreamReader != null) {
+        OutputConfiguration yuvOut = new OutputConfiguration(frameStreamReader.getSurface());
+        configs.add(yuvOut);
+    }
         cameraDevice.createCaptureSession(
                 new SessionConfiguration(
                         SessionConfiguration.SESSION_REGULAR,
-                        outputConfigs,
+                        configs,
                         Executors.newSingleThreadExecutor(),
                         callback));
     }
@@ -1551,7 +1598,7 @@ class Camera
         }
 
         createCaptureSession(
-                CameraDevice.TEMPLATE_PREVIEW, onSuccessCallback, pictureImageReader.getSurface());
+                CameraDevice.TEMPLATE_RECORD, onSuccessCallback);
     }
 
     private void startPreviewWithVideoRendererStream(@Nullable Runnable onSuccessCallback)
