@@ -453,8 +453,8 @@ class Camera
                 this.imageFormatGroup,
                 1);
         frameStreamReader = ImageReader.newInstance(
-                resolutionFeature.getPreviewSize().getWidth(),
-                resolutionFeature.getPreviewSize().getHeight(),
+                resolutionFeature.getCaptureSize().getWidth(),
+                resolutionFeature.getCaptureSize().getHeight(),
                 ImageStreamReader.computeStreamImageFormat(imageFormatGroup),
                 4);
 

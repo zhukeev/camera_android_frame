@@ -1,3 +1,7 @@
+## 0.10.22
+
+- support `frameFps`
+
 ## 0.10.21
 
 - support `frameFps`
