@@ -10,6 +10,7 @@ import 'package:camera_platform_interface_frame/camera_platform_interface_frame.
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 
 /// Camera example home widget.
@@ -638,10 +639,10 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       CameraDescription cameraDescription) async {
     final CameraController cameraController = CameraController(
       cameraDescription,
-      ResolutionPreset.medium,
+      ResolutionPreset.veryHigh,
       enableAudio: enableAudio,
-      imageFormatGroup: ImageFormatGroup.nv21,
-      frameFps: 2,
+      imageFormatGroup: ImageFormatGroup.yuv420,
+      frameFps: 6,
     );
 
     controller = cameraController;
@@ -1026,27 +1027,37 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     }
 
     try {
-      final XFile file = await cameraController.takePicture();
+      // final XFile file = await cameraController.takePicture();
+ 
+      final file = XFile(
+          '${(await getTemporaryDirectory()).path}/${DateTime.now().millisecondsSinceEpoch}.jpg');
+          
       final sw = Stopwatch()..start();
-
       final frame = await cameraController.capturePreviewFrame();
 
       await cameraController.saveAsJpeg(frame, file.path, 90, 90);
       print(
           'first frame took ${sw.elapsedMilliseconds} ms ${frame.width}x${frame.height}');
 
-      DateTime lastTime = DateTime.now();
+      sw.reset();
+
+      await cameraController.capturePreviewFrameJpeg(file.path, 0, 90);
+
+      print(
+          'capturePreviewFrameJpeg took ${sw.elapsedMilliseconds} ms ${frame.width}x${frame.height}');
+
+      // DateTime lastTime = DateTime.now();
 
       Future.delayed(Duration(seconds: 5), () {
         cameraController.stopFrameStream();
         print('stopped frame stream');
       });
 
-      await cameraController.startFrameStream((frame) {
-        print(
-            'frame took ${DateTime.now().difference(lastTime).inMilliseconds} ms ${frame.width}x${frame.height}');
-        lastTime = DateTime.now();
-      });
+      // await cameraController.startFrameStream((frame) {
+      //   print(
+      //       'frame took ${DateTime.now().difference(lastTime).inMilliseconds} ms ${frame.width}x${frame.height}');
+      //   lastTime = DateTime.now();
+      // });
       print('frame took ${sw.elapsedMilliseconds} ms');
       return file;
     } on CameraException catch (e) {

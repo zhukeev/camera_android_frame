@@ -1,3 +1,7 @@
+## 0.10.23
+
+- Frame Picture quality 
+
 ## 0.10.22
 
 - support `frameFps`

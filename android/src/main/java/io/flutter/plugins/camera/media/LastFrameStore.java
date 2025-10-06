@@ -27,6 +27,11 @@ public final class LastFrameStore {
     private int ringIdx = 0;
     private int ringW = -1, ringH = -1;
 
+
+    private final Object snapshotLock = new Object();
+    private byte[] snapshotBuf;
+    private byte[] rotatedBuf;
+
     // Workspace for libyuv rotations/conversions
     private final YuvWorkspace ws = new YuvWorkspace();
 
@@ -119,27 +124,36 @@ public final class LastFrameStore {
         Nv21Frame f = last;
         if (f == null || f.nv21 == null) throw new IOException("No frame available");
 
-        final boolean rotate = ((rotationDegrees % 360) + 360) % 360 != 0;
-        byte[] src = f.nv21;
-        int w = f.width, h = f.height;
+        final byte[] src;
+        final int w = f.width, h = f.height;
+        synchronized (snapshotLock) {
+            if (snapshotBuf == null || snapshotBuf.length != f.nv21.length) {
+                snapshotBuf = new byte[f.nv21.length];
+            }
+            System.arraycopy(f.nv21, 0, snapshotBuf, 0, f.nv21.length);
+            src = snapshotBuf;
+        }
 
+        final boolean rotate = ((rotationDegrees % 360) + 360) % 360 != 0;
         byte[] toCompress = src;
         int cw = w, ch = h;
 
         if (rotate) {
-            // Rotate NV21 via libyuv and obtain final dimensions
-            byte[] rotated = new byte[nv21Size((rotationDegrees % 180 == 0) ? w : h,
-                                               (rotationDegrees % 180 == 0) ? h : w)];
-            ws.rotateNv21(src, w, h, rotationDegrees, rotated);
-            toCompress = rotated;
+            int rw = (rotationDegrees % 180 == 0) ? w : h;
+            int rh = (rotationDegrees % 180 == 0) ? h : w;
+            int need = nv21Size(rw, rh);
+            if (rotatedBuf == null || rotatedBuf.length != need) {
+                rotatedBuf = new byte[need];
+            }
+            ws.rotateNv21(src, w, h, rotationDegrees, rotatedBuf);
+            toCompress = rotatedBuf;
             cw = ws.getRotatedWidth();
             ch = ws.getRotatedHeight();
         }
 
         YuvImage yuv = new YuvImage(toCompress, ImageFormat.NV21, cw, ch, null);
         try (FileOutputStream fos = new FileOutputStream(outputPath)) {
-            Rect rect = new Rect(0, 0, cw, ch);
-            if (!yuv.compressToJpeg(rect, quality, fos)) {
+            if (!yuv.compressToJpeg(new Rect(0, 0, cw, ch), quality, fos)) {
                 throw new IOException("compressToJpeg failed");
             }
         }
