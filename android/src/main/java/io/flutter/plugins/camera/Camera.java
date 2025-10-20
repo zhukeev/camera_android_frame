@@ -161,6 +161,17 @@ class Camera
      */
     private HandlerThread backgroundHandlerThread;
 
+    /**
+     * A {@link Handler} dedicated for IO-bound tasks (e.g., JPEG write), to avoid
+     * blocking camera callbacks.
+     */
+    Handler ioHandler;
+
+    /**
+     * A dedicated thread for IO-bound tasks.
+     */
+    private HandlerThread ioHandlerThread;
+
     CameraDeviceWrapper cameraDevice;
     CameraCaptureSession captureSession;
     @VisibleForTesting
@@ -493,12 +504,12 @@ class Camera
                             Runnable onSuccess = recordingVideo
                                     ? null
                                     : () -> dartMessenger.sendCameraInitializedEvent(
-                                    resolutionFeature.getPreviewSize().getWidth(),
-                                    resolutionFeature.getPreviewSize().getHeight(),
-                                    cameraFeatures.getExposureLock().getValue(),
-                                    cameraFeatures.getAutoFocus().getValue(),
-                                    cameraFeatures.getExposurePoint().checkIsSupported(),
-                                    cameraFeatures.getFocusPoint().checkIsSupported());
+                                            resolutionFeature.getPreviewSize().getWidth(),
+                                            resolutionFeature.getPreviewSize().getHeight(),
+                                            cameraFeatures.getExposureLock().getValue(),
+                                            cameraFeatures.getAutoFocus().getValue(),
+                                            cameraFeatures.getExposurePoint().checkIsSupported(),
+                                            cameraFeatures.getFocusPoint().checkIsSupported());
                             startPreview(onSuccess);
                         } catch (Exception e) {
                             String message = (e.getMessage() == null)
@@ -643,7 +654,7 @@ class Camera
                 previewRequestBuilder.set(CaptureRequest.CONTROL_AE_ANTIBANDING_MODE,
                         CaptureRequest.CONTROL_AE_ANTIBANDING_MODE_AUTO);
 
-                        
+
                 previewRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,
                         new Range<>(15, 30));
 
@@ -703,17 +714,17 @@ class Camera
             List<OutputConfiguration> outputConfigs, CameraCaptureSession.StateCallback callback)
             throws CameraAccessException {
 
-                 List<OutputConfiguration> configs = new ArrayList<>();
-    OutputConfiguration prevOut = new OutputConfiguration(
-            new Surface(flutterTexture.surfaceTexture()));
+        List<OutputConfiguration> configs = new ArrayList<>();
+        OutputConfiguration prevOut = new OutputConfiguration(
+                new Surface(flutterTexture.surfaceTexture()));
    
-            
-    configs.add(prevOut);
 
-    if (frameStreamReader != null) {
-        OutputConfiguration yuvOut = new OutputConfiguration(frameStreamReader.getSurface());
-        configs.add(yuvOut);
-    }
+        configs.add(prevOut);
+
+        if (frameStreamReader != null) {
+            OutputConfiguration yuvOut = new OutputConfiguration(frameStreamReader.getSurface());
+            configs.add(yuvOut);
+        }
         cameraDevice.createCaptureSession(
                 new SessionConfiguration(
                         SessionConfiguration.SESSION_REGULAR,
@@ -813,7 +824,7 @@ class Camera
     }
 
     private void saveJpegFromNV21(byte[] nv21, int width, int height,
-                                  String outputPath, int rotationDegrees, int quality) throws IOException {
+            String outputPath, int rotationDegrees, int quality) throws IOException {
         if (rotationDegrees == 0) {
             YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
             try (FileOutputStream fos = new FileOutputStream(outputPath)) {
@@ -828,7 +839,7 @@ class Camera
     }
 
     private void saveJpegFromNV21WithRotation(byte[] nv21, int width, int height,
-                                              String outputPath, int rotationDegrees, int quality) throws IOException {
+            String outputPath, int rotationDegrees, int quality) throws IOException {
         YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
         try (FileOutputStream fos = new FileOutputStream(outputPath)) {
             Rect rect = new Rect(0, 0, width, height);
@@ -931,8 +942,8 @@ class Camera
     }
 
     public void capturePreviewFrameJpeg(@NonNull String outputPath, int rotationDegrees, int quality,
-                                        @NonNull Messages.Result<String> result) {
-        backgroundHandler.post(() -> {
+            @NonNull Messages.Result<String> result) {
+        (ioHandler != null ? ioHandler : backgroundHandler).post(() -> {
             try {
                 if (!lastFrameStore.hasFrame()) {
                     mainHandler.post(
@@ -954,7 +965,7 @@ class Camera
             int quality,
             Messages.Result<String> result
     ) {
-        backgroundHandler.post(() -> {
+        (ioHandler != null ? ioHandler : backgroundHandler).post(() -> {
             try {
                 final int width = ((Number) imageData.get("width")).intValue();
                 final int height = ((Number) imageData.get("height")).intValue();
@@ -996,7 +1007,7 @@ class Camera
         });
     }
 
-
+    
 
     private void writeJpegFromNv21(byte[] nv21, int width, int height, String outputPath, int quality)
             throws IOException {
@@ -1153,6 +1164,18 @@ class Camera
             // Ignore exception in case the thread has already started.
         }
         backgroundHandler = HandlerFactory.create(backgroundHandlerThread.getLooper());
+
+        // Start a dedicated IO thread to keep heavy file operations off the camera
+        // background handler.
+        if (ioHandlerThread == null) {
+            ioHandlerThread = HandlerThreadFactory.create("CameraIO");
+            try {
+                ioHandlerThread.start();
+            } catch (IllegalThreadStateException e) {
+                // Ignore exception in case the thread has already started.
+            }
+            ioHandler = HandlerFactory.create(ioHandlerThread.getLooper());
+        }
     }
 
     /**
@@ -1164,6 +1187,12 @@ class Camera
         }
         backgroundHandlerThread = null;
         backgroundHandler = null;
+
+        if (ioHandlerThread != null) {
+            ioHandlerThread.quitSafely();
+        }
+        ioHandlerThread = null;
+        ioHandler = null;
     }
 
     /**
