@@ -1,3 +1,7 @@
+## 0.10.25
+
+- feat: add dedicated IO handler for improved file operations
+
 ## 0.10.24
 
 - Performance optimizations 
